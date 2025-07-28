@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface EmployeesProps {
   id?: string;
   name: string;
@@ -12,3 +14,22 @@ export interface CCSTaffProps {
 }
 
 export type TicketStatusTypes = "Open" | "Recalled" | "Closed";
+
+export interface InvoiceProps {
+  id?: string;
+  ActionDate: Timestamp;
+  ActionTime: string;
+  Address: string;
+  Apartment: string;
+  CustomerName: string;
+  Description: string;
+  NumberOfParts: number;
+  PartsCost: number;
+  PaymentType: string;
+  Phone: string;
+  Status: string;
+  Technician: string;
+  TicketNumber: string;
+  TicketStatus: TicketStatusTypes;
+  TotalPrice: number;
+}

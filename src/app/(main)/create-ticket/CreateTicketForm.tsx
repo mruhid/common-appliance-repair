@@ -20,15 +20,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchCollection } from "@/lib/fetchCollection";
 import { EmployeesProps, TicketStatusTypes } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { capitalizeSentences, cn } from "@/lib/utils";
 import { CreateTicketFormValue, createTicketSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Timestamp } from "firebase/firestore";
-import { useForm } from "react-hook-form";
-import LoginModal from "../LoginModal";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import LoginModal from "../LoginModal";
 import { createTicket } from "./createTicket";
 
 export default function CreateTicketForm() {
@@ -51,6 +52,9 @@ export default function CreateTicketForm() {
       TicketNumber: "",
     },
   });
+
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const {
     data: employees,
@@ -99,14 +103,14 @@ export default function CreateTicketForm() {
       const firebaseData = {
         ActionDate: Timestamp.fromDate(jsDate),
         ActionTime,
-        Address,
+        Address: capitalizeSentences(Address),
         Apartment,
         CustomerName,
         Phone,
         Description,
         SC: Number(SC),
         Technician,
-        TicketNumber: TicketNumber,
+        TicketNumber: TicketNumber.toUpperCase(),
         Done: false,
         TicketStatus: "Open" as TicketStatusTypes,
       };
@@ -114,6 +118,8 @@ export default function CreateTicketForm() {
         const { success, message } = await createTicket(firebaseData);
         if (success) {
           toast.success(message);
+          queryClient.invalidateQueries({ queryKey: ["tickets"] });
+          router.push("/tickets");
         }
       } catch (error) {
         console.error("Create ticket failed: ", error);

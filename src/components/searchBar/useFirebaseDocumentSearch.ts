@@ -10,6 +10,7 @@ import {
   DocumentData,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { capitalizeSentences } from "@/lib/utils";
 
 export interface FirebaseSearchResult<T = DocumentData> {
   documents: T[];
@@ -46,13 +47,17 @@ function useFirebaseDocumentSearch<T = DocumentData>(
         let foundDocs: T[] = [];
 
         for (const field of fieldsNameArray) {
+          const formattedSearchValue =
+            field === "TicketNumber"
+              ? searchValue.toUpperCase()
+              : capitalizeSentences(searchValue);
+
           const q = query(
             collection(db, documentName),
             orderBy(field),
-            startAt(searchValue),
-            endAt(searchValue + "\uf8ff")
+            startAt(formattedSearchValue),
+            endAt(formattedSearchValue + "\uf8ff")
           );
-
           const snapshot = await getDocs(q);
           if (!snapshot.empty) {
             foundDocs = snapshot.docs.map((doc) => ({
@@ -73,7 +78,7 @@ function useFirebaseDocumentSearch<T = DocumentData>(
       } finally {
         setIsPending(false);
       }
-    }, 2000); 
+    }, 2000);
 
     return () => clearTimeout(delay);
   }, [searchValue, documentName, fieldsNameArray]);

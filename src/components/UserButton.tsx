@@ -4,7 +4,16 @@ import { logout } from "@/app/(main)/action";
 import { useSession } from "@/app/(main)/context/UserProvider";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, LogOutIcon, Monitor, Moon, Sun, Tickets } from "lucide-react";
+import {
+  Check,
+  FileText,
+  LogOutIcon,
+  Monitor,
+  Moon,
+  Sun,
+  TicketPlusIcon,
+  Tickets,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import {
@@ -56,10 +65,22 @@ export default function UserButton({ className }: UserButtonProps) {
           </div>
         </div>
 
-        <Link href={`/create-tiket`}>
+        <Link href={`/create-ticket`}>
           <DropdownMenuItem className="rounded-lg py-2 transition-all hover:bg-primary/10">
             <Tickets className="mr-2 size-4" />
             New Ticket
+          </DropdownMenuItem>
+        </Link>
+        <Link href={`/tickets`}>
+          <DropdownMenuItem className="rounded-lg py-2 transition-all hover:bg-primary/10">
+            <TicketPlusIcon className="mr-2 size-4" />
+            Tickets
+          </DropdownMenuItem>
+        </Link>
+        <Link href={`/invoices`}>
+          <DropdownMenuItem className="rounded-lg py-2 transition-all hover:bg-primary/10">
+            <FileText className="mr-2 size-4" />
+            Invoices
           </DropdownMenuItem>
         </Link>
 

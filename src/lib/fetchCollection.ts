@@ -72,18 +72,16 @@ export async function findDocumentsByFieldValuePaginated<T>(
   pageNumber: number,
   setTotalPages: (count: number) => void,
   orderByFieldName: string
-): Promise<T[]> {
+): Promise<(T & { id: string })[]> {
   const db = getFirestore(app);
   const collectionRef = collection(db, collectionName);
 
-  // Get total count for pagination
   const countQuery = query(collectionRef, where(field, "==", fieldValue));
   const snapshotCount = await getCountFromServer(countQuery);
   const totalCount = snapshotCount.data().count;
   const totalPages = Math.ceil(totalCount / pageSize);
   setTotalPages(totalPages);
 
-  // Use the dynamic order field in both queries
   let baseQuery = query(
     collectionRef,
     where(field, "==", fieldValue),
@@ -95,7 +93,6 @@ export async function findDocumentsByFieldValuePaginated<T>(
     const previousCursor = cursorCache[pageNumber - 1];
 
     if (!previousCursor) {
-      // Walk to the previous page cursor
       const tempQuery = query(
         collectionRef,
         where(field, "==", fieldValue),
@@ -127,5 +124,8 @@ export async function findDocumentsByFieldValuePaginated<T>(
     cursorCache[pageNumber] = docs[docs.length - 1];
   }
 
-  return docs.map((doc) => doc.data() as T);
+  return docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as T),
+  }));
 }

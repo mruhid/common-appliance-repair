@@ -20,3 +20,16 @@ export function formattedDate(timestamp: Timestamp): string {
   const date = timestamp.toDate();
   return format(date, "dd MMM yyyy, HH:mm");
 }
+
+export function capitalizeSentences(text: string): string {
+  if (!text) return "";
+
+  return text
+    .split(".")
+    .map((sentence) => {
+      const trimmed = sentence.trim();
+      if (trimmed.length === 0) return "";
+      return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+    })
+    .join(". ");
+}

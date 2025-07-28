@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import ReactQueryProvider from "./ReactQueryProvider";
+import { Geist, Geist_Mono } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
+import "./globals.css";
+import ReactQueryProvider from "./ReactQueryProvider";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextTopLoader color="#1e3a8a" height={4} />
         <ReactQueryProvider>
           <ThemeProvider
             attribute="class"

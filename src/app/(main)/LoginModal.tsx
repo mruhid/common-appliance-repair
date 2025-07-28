@@ -15,7 +15,6 @@ export default function LoginModal({
   children: React.ReactNode;
 }) {
   const { user } = useSession();
-  const [isClicked, setIsClicked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
   const [modalInputs, setModalInputs] = useState<CCSTaffProps>({
@@ -30,7 +29,6 @@ export default function LoginModal({
 
   const handleLogin = async () => {
     try {
-      setIsClicked(true);
       setIsLoading(true);
       setError(null);
       const foundUser = await findUserByCredentials(
@@ -85,9 +83,8 @@ export default function LoginModal({
       setIsLoading(false);
     }
   };
-  if (user === undefined) return null;
 
-  if (user) return children;
+  if (user && user !== undefined) return children;
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center gap-4 p-4">

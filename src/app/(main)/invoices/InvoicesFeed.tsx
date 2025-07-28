@@ -1,8 +1,8 @@
 "use client";
-import LoadingButton from "@/components/LoadingButton";
 import Pagination, { PaginationSkeleton } from "@/components/Pagination";
 import FirebaseDocumentSearchBar from "@/components/searchBar/FirebaseDocumentSearchBar";
 import { TicketItemSkeleton } from "@/components/TicketItemSkeleton";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { findDocumentsByFieldValuePaginated } from "@/lib/fetchCollection";
-import { TicketStatusTypes } from "@/lib/types";
+import { InvoiceProps, TicketStatusTypes } from "@/lib/types";
 import {
   capitalizeSentences,
   formattedDate,
@@ -21,30 +21,29 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Info } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-import { TicketProps } from "../create-ticket/createTicket";
-import { useUpdateTicketStatus } from "./mutation";
 
-export default function TicketFeed({
+export default function InvoicesFeed({
   ticketStatus,
 }: {
   ticketStatus: TicketStatusTypes;
 }) {
-  const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceProps | null>(
     null
   );
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const {
-    data: tickets,
+    data: invoices,
     isPending,
     isError,
-  } = useQuery<TicketProps[]>({
-    queryKey: ["tickets", ticketStatus, page],
+  } = useQuery<InvoiceProps[]>({
+    queryKey: ["invoices", ticketStatus, page],
     queryFn: async () =>
-      await findDocumentsByFieldValuePaginated<TicketProps>(
-        "Tickets",
+      await findDocumentsByFieldValuePaginated<InvoiceProps>(
+        "Jobs",
         "TicketStatus",
         ticketStatus,
         10, //Page size
@@ -58,15 +57,15 @@ export default function TicketFeed({
 
   return (
     <div className="flex w-full flex-col items-start">
-      <FirebaseDocumentSearchBar<TicketProps>
-        searchBarPlaceholder="Seacrh tickets"
-        documentName="Tickets"
+      <FirebaseDocumentSearchBar<InvoiceProps>
+        searchBarPlaceholder="Seacrh invoices"
+        documentName="Jobs"
         fieldsNameArray={["TicketNumber", "Address"]}
       />
       <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">
           <h2 className="text-2xl text-primary text-center font-semibold py-2">
-            Tickets
+            Invoices
           </h2>
 
           {!isPending ? (
@@ -92,16 +91,16 @@ export default function TicketFeed({
                   <div className="text-destructive w-full text-center text-sm font-medium border border-destructive rounded-md p-4 bg-destructive/10">
                     Cannot connect to server. Please try again later.
                   </div>
-                ) : tickets.length === 0 ? (
+                ) : invoices.length === 0 ? (
                   <div className="text-muted-foreground text-center w-full text-sm font-medium border border-border rounded-md p-4 bg-muted">
-                    No ticket found.
+                    No invoice found.
                   </div>
                 ) : (
-                  tickets.map((ticket, index) => (
-                    <TicketItem
+                  invoices.map((invoice, index) => (
+                    <InvoiceItem
                       key={index}
-                      ticket={ticket}
-                      onShowTickedValue={setSelectedTicket}
+                      invoice={invoice}
+                      onShowInvoiceValue={setSelectedInvoice}
                     />
                   ))
                 )}
@@ -113,7 +112,7 @@ export default function TicketFeed({
         {/* RIGHT: Ticket Detail Viewer */}
         <div className="p-4 hidden overflow-y-auto h-full lg:flex items-center justify-center">
           <div className="w-full">
-            <TicketDetailsCard ticket={selectedTicket} />
+            <InvoiceDetailsCard invoice={selectedInvoice} />
           </div>
         </div>
       </div>
@@ -121,18 +120,18 @@ export default function TicketFeed({
   );
 }
 
-interface TicketItemProps {
-  ticket: TicketProps;
-  onShowTickedValue: (ticket: TicketProps) => void;
+interface InvoiceItemProps {
+  invoice: InvoiceProps;
+  onShowInvoiceValue: (invoice: InvoiceProps) => void;
 }
-function TicketItem({ ticket, onShowTickedValue }: TicketItemProps) {
-  const { Description, ActionDate, TicketNumber } = ticket;
+function InvoiceItem({ invoice, onShowInvoiceValue }: InvoiceItemProps) {
+  const { Description, ActionDate, TicketNumber } = invoice;
   const timeLeft = getTimeLeftFromTimestamp(ActionDate);
 
   return (
     <>
       <div
-        onClick={() => onShowTickedValue(ticket)}
+        onClick={() => onShowInvoiceValue(invoice)}
         title={Description}
         className="hidden lg:flex justify-center items-center cursor-pointer rounded-lg border bg-card p-4 shadow hover:bg-accent hover:text-accent-foreground transition"
       >
@@ -149,122 +148,104 @@ function TicketItem({ ticket, onShowTickedValue }: TicketItemProps) {
           </span>
         </div>
       </div>
-      <TicketDetailsDialog ticket={ticket} timeLeft={timeLeft} />
+      <InvoiceDetailsDialog invoice={invoice} timeLeft={timeLeft} />
     </>
   );
 }
 
-function TicketDetailsCard({ ticket }: { ticket: TicketProps | null }) {
-  const [isOpen, setIsOpen] = useState<boolean>(!!ticket);
-  const mutation = useUpdateTicketStatus();
-
-  if (!ticket || isOpen) {
+function InvoiceDetailsCard({ invoice }: { invoice: InvoiceProps | null }) {
+  if (!invoice) {
     return (
       <div className="flex mx-auto w-[300px] aspect-square shadow flex-col items-center justify-center rounded-xl border border-muted-foreground bg-muted p-6 text-muted-foreground space-y-4">
         <Info className="h-10 w-10 text-muted-foreground" />
         <p className="text-center text-base font-medium">
-          Click a ticket on the left to view its details
+          Click a invoice on the left to view its details
         </p>
       </div>
     );
   }
 
-  const updateStatusFromClosedToRecalled = () => {
-    mutation.mutate(
-      { ticketNumber: ticket.TicketNumber },
-      {
-        onSuccess: () => {
-          setIsOpen(true);
-        },
-      }
-    );
-  };
-
   return (
-    <div className="flex  w-full flex-col justify-center rounded-xl border bg-card p-6 shadow-sm space-y-4">
+    <div className="flex w-full flex-col justify-center rounded-xl border bg-card p-6 shadow-sm space-y-4">
       <div className="w-full flex justify-between items-center">
         <h2 className="text-2xl text-primary font-semibold">
-          Ticket Nº {ticket.TicketNumber}
+          Ticket Nº {invoice.TicketNumber}
         </h2>
-        {ticket.TicketStatus === "Closed" && (
-          <LoadingButton
-            loading={mutation.isPending}
-            onClick={updateStatusFromClosedToRecalled}
-            variant={"companyBtn"}
-            className="rounded-md"
-          >
-            Recalled
-          </LoadingButton>
-        )}
+        <Button className="text-primary" variant={"outline"} asChild>
+          <Link href={`/invoices/${invoice.id}`}>See invoice</Link>
+        </Button>
       </div>
 
-      <div className="text-muted-foreground space-y-1">
+      {/* Equal-width compact two-column layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm text-muted-foreground">
         <p>
-          <span className="font-medium">Customer:</span> {ticket.CustomerName}
+          <span className="font-medium">Customer:</span> {invoice.CustomerName}
         </p>
         <p>
-          <span className="font-medium">Phone:</span> {ticket.Phone}
+          <span className="font-medium">Phone:</span> {invoice.Phone}
         </p>
         <p>
           <span className="font-medium">Address:</span>{" "}
-          {capitalizeSentences(ticket.Address)} — Apt{":"}
-          {ticket.Apartment}
+          {capitalizeSentences(invoice.Address)} — Apt{":"}
+          {invoice.Apartment}
         </p>
         <p>
-          <span className="font-medium">SC:</span> {ticket.SC}
+          <span className="font-medium">Technician:</span> {invoice.Technician}
         </p>
         <p>
-          <span className="font-medium">Technician:</span> {ticket.Technician}
+          <span className="font-medium">Status:</span> {invoice.TicketStatus}
         </p>
         <p>
-          <span className="font-medium">Status:</span> {ticket.TicketStatus}
-        </p>
-        <p>
-          <span className="font-medium">Action Time:</span> {ticket.ActionTime}
+          <span className="font-medium">Action Time:</span> {invoice.ActionTime}
         </p>
         <p>
           <span className="font-medium">Action Date:</span>{" "}
-          {formattedDate(ticket.ActionDate)}
+          {formattedDate(invoice.ActionDate)}
+        </p>
+        <p>
+          <span className="font-medium">Number of Parts:</span>{" "}
+          {invoice.NumberOfParts}
+        </p>
+        <p>
+          <span className="font-medium">Parts Cost:</span> $
+          {invoice.PartsCost.toFixed(2)}
+        </p>
+        <p>
+          <span className="font-medium">Payment Type:</span>{" "}
+          {invoice.PaymentType}
+        </p>
+        <p>
+          <span className="font-medium">Total Price:</span> $
+          {invoice.TotalPrice.toFixed(2)}
         </p>
       </div>
 
       <div>
         <h3 className="text-lg font-medium">Description</h3>
         <p className="text-sm text-muted-foreground">
-          {capitalizeSentences(ticket.Description)}
+          {capitalizeSentences(invoice.Description)}
         </p>
       </div>
     </div>
   );
 }
 
-function TicketDetailsDialog({
-  ticket,
+function InvoiceDetailsDialog({
+  invoice,
   timeLeft,
 }: {
-  ticket: TicketProps | null;
+  invoice: InvoiceProps | null;
   timeLeft: string;
 }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  if (!ticket) return null;
-  const mutation = useUpdateTicketStatus();
+  if (!invoice) return null;
 
   const formattedDate = format(
-    ticket.ActionDate.toDate(),
+    invoice.ActionDate.toDate(),
     "dd MMM yyyy, HH:mm"
   );
 
-  const updateStatusFromClosedToRecalled = () => {
-    mutation.mutate(
-      { ticketNumber: ticket.TicketNumber },
-      {
-        onSuccess: () => {
-          setIsOpen(false);
-        },
-      }
-    );
-  };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
@@ -272,72 +253,85 @@ function TicketDetailsDialog({
           <div className="flex w-full justify-between items-start">
             <div className="flex flex-col justify-start items-start max-w-[85%]">
               <h3 className="text-base capitalize font-medium truncate">
-                {ticket.Description}
+                {invoice.Description}
               </h3>
               <p className="text-sm text-muted-foreground">
                 Deadline {timeLeft}
               </p>
             </div>
             <span className="text-sm font-semibold whitespace-nowrap">
-              TNº {ticket.TicketNumber}
+              TNº {invoice.TicketNumber}
             </span>
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="p-6">
+
+      <DialogContent className="p-6 max-h-[90vh]  overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-primary">
-            Ticket Nº {ticket.TicketNumber}
-          </DialogTitle>
+          <div className="w-full flex mt-4 text-primary justify-between items-center">
+            <DialogTitle>Ticket Nº {invoice.TicketNumber}</DialogTitle>
+            <Button variant={"outline"} asChild>
+              <Link href={`/invoices/${invoice.id}`}>See invoice</Link>
+            </Button>
+          </div>
         </DialogHeader>
 
-        <div className="text-muted-foreground space-y-1 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-muted-foreground pt-4">
           <p>
-            <span className="font-medium">Customer:</span> {ticket.CustomerName}
+            <span className="font-medium">Customer:</span>{" "}
+            {invoice.CustomerName}
           </p>
           <p>
-            <span className="font-medium">Phone:</span> {ticket.Phone}
+            <span className="font-medium">Phone:</span> {invoice.Phone}
           </p>
           <p>
             <span className="font-medium">Address:</span>{" "}
-            {capitalizeSentences(ticket.Address)} — Apt{":"}
-            {ticket.Apartment}
+            {capitalizeSentences(invoice.Address)} — Apt {invoice.Apartment}
           </p>
           <p>
-            <span className="font-medium">SC:</span> {ticket.SC}
+            <span className="font-medium">Technician:</span>{" "}
+            {invoice.Technician}
           </p>
           <p>
-            <span className="font-medium">Technician:</span> {ticket.Technician}
+            <span className="font-medium">Ticket Status:</span>{" "}
+            {invoice.TicketStatus}
           </p>
           <p>
-            <span className="font-medium">Status:</span> {ticket.TicketStatus}
+            <span className="font-medium">General Status:</span>{" "}
+            {invoice.Status}
           </p>
           <p>
             <span className="font-medium">Action Time:</span>{" "}
-            {ticket.ActionTime}
+            {invoice.ActionTime}
           </p>
           <p>
-            <span className="font-medium">Action Date:</span> {formattedDate}
+            <span className="font-medium">Action Date:</span> {timeLeft} |{" "}
+            {formattedDate}
+          </p>
+          <p>
+            <span className="font-medium">Number of Parts:</span>{" "}
+            {invoice.NumberOfParts}
+          </p>
+          <p>
+            <span className="font-medium">Parts Cost:</span> $
+            {invoice.PartsCost.toFixed(2)}
+          </p>
+          <p>
+            <span className="font-medium">Payment Type:</span>{" "}
+            {invoice.PaymentType}
+          </p>
+          <p>
+            <span className="font-medium">Total Price:</span> $
+            {invoice.TotalPrice.toFixed(2)}
           </p>
         </div>
 
         <div className="pt-4">
           <h3 className="text-sm font-medium mb-1">Description</h3>
           <p className="text-sm text-muted-foreground">
-            {capitalizeSentences(ticket.Description)}
+            {capitalizeSentences(invoice.Description)}
           </p>
         </div>
-
-        {ticket.TicketStatus === "Closed" && (
-          <LoadingButton
-            loading={mutation.isPending}
-            onClick={updateStatusFromClosedToRecalled}
-            variant="companyBtn"
-            className="mt-4 w-full rounded-md"
-          >
-            Recalled
-          </LoadingButton>
-        )}
       </DialogContent>
     </Dialog>
   );

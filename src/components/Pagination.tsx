@@ -15,7 +15,7 @@ export default function Pagination({
   const pageItems = generatePageNumbers(pageNumber, totalPages);
 
   return (
-    <div className="flex justify-center items-center gap-2 mt-6 select-none">
+    <div className="flex justify-center items-center gap-2  select-none">
       <Button
         onClick={() => setPageNumber(pageNumber - 1)}
         variant={"ghost"}
@@ -92,7 +92,7 @@ function generatePageNumbers(
 
 export function PaginationSkeleton() {
   return (
-    <div className="flex justify-center items-center gap-2 mt-6">
+    <div className="flex justify-center items-center gap-2 ">
       <Skeleton className="h-8 w-14 rounded bg-muted-foreground" />
 
       {Array.from({ length: 3 }).map((_, idx) => (

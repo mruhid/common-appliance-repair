@@ -24,6 +24,7 @@ import { Info } from "lucide-react";
 import { useState } from "react";
 import { TicketProps } from "../create-ticket/createTicket";
 import { useUpdateTicketStatus } from "./mutation";
+import SendMessageToTechnicianDialog from "./SendMessageToTechnicanDialog";
 
 export default function TicketFeed({
   ticketStatus,
@@ -33,6 +34,8 @@ export default function TicketFeed({
   const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(
     null
   );
+  const [sendMessageDialog, setSendMessageDialog] = useState<boolean>(false);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -57,80 +60,101 @@ export default function TicketFeed({
   });
 
   return (
-    <div className="flex w-full flex-col items-start">
-      <FirebaseDocumentSearchBar<TicketProps>
-        searchBarPlaceholder="Seacrh tickets"
-        documentName="Tickets"
-        fieldsNameArray={["TicketNumber", "Address"]}
+    <>
+      <SendMessageToTechnicianDialog
+        ticket={selectedTicket}
+        open={sendMessageDialog}
+        onOpenChange={setSendMessageDialog}
       />
-      <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
-        <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">
-          <h2 className="text-2xl text-primary text-center font-semibold py-2">
-            Tickets
-          </h2>
+      <div className="flex w-full flex-col items-start">
+        <FirebaseDocumentSearchBar<TicketProps>
+          searchBarPlaceholder="Seacrh tickets"
+          documentName="Tickets"
+          fieldsNameArray={["TicketNumber", "Address"]}
+        />
+        <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
+          <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">
+            <h2 className="text-2xl text-primary text-center font-semibold py-2">
+              Tickets
+            </h2>
 
-          {!isPending ? (
-            totalPages > 1 && (
-              <Pagination
-                pageNumber={page}
-                totalPages={totalPages}
-                setPageNumber={setPage}
-              />
-            )
-          ) : (
-            <PaginationSkeleton />
-          )}
+            {!isPending ? (
+              totalPages > 1 && (
+                <Pagination
+                  pageNumber={page}
+                  totalPages={totalPages}
+                  setPageNumber={setPage}
+                />
+              )
+            ) : (
+              <PaginationSkeleton />
+            )}
 
-          <div className="flex-1 h-full min-h-0">
-            <ScrollArea className="h-[42vh]  w-full pr-1">
-              <div className="flex flex-col gap-y-2">
-                {isPending ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <TicketItemSkeleton key={i} />
-                  ))
-                ) : isError ? (
-                  <div className="text-destructive w-full text-center text-sm font-medium border border-destructive rounded-md p-4 bg-destructive/10">
-                    Cannot connect to server. Please try again later.
-                  </div>
-                ) : tickets.length === 0 ? (
-                  <div className="text-muted-foreground text-center w-full text-sm font-medium border border-border rounded-md p-4 bg-muted">
-                    No ticket found.
-                  </div>
-                ) : (
-                  tickets.map((ticket, index) => (
-                    <TicketItem
-                      key={index}
-                      ticket={ticket}
-                      onShowTickedValue={setSelectedTicket}
-                    />
-                  ))
-                )}
-              </div>
-            </ScrollArea>
+            <div className="flex-1 h-full min-h-0">
+              <ScrollArea className="h-[42vh]  w-full pr-1">
+                <div className="flex flex-col gap-y-2">
+                  {isPending ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <TicketItemSkeleton key={i} />
+                    ))
+                  ) : isError ? (
+                    <div className="text-destructive w-full text-center text-sm font-medium border border-destructive rounded-md p-4 bg-destructive/10">
+                      Cannot connect to server. Please try again later.
+                    </div>
+                  ) : tickets.length === 0 ? (
+                    <div className="text-muted-foreground text-center w-full text-sm font-medium border border-border rounded-md p-4 bg-muted">
+                      No ticket found.
+                    </div>
+                  ) : (
+                    tickets.map((ticket, index) => (
+                      <TicketItem
+                        openShowSendMessageDialog={setSendMessageDialog}
+                        key={index}
+                        ticket={ticket}
+                        onShowTickedValue={setSelectedTicket}
+                      />
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT: Ticket Detail Viewer */}
-        <div className="p-4 hidden overflow-y-auto h-full lg:flex items-center justify-center">
-          <div className="w-full">
-            <TicketDetailsCard ticket={selectedTicket} />
+          {/* RIGHT: Ticket Detail Viewer */}
+          <div className="p-4 hidden overflow-y-auto h-full lg:flex items-center justify-center">
+            <div className="w-full">
+              <TicketDetailsCard
+                openShowSendMessageDialog={setSendMessageDialog}
+                ticket={selectedTicket}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
 interface TicketItemProps {
   ticket: TicketProps;
   onShowTickedValue: (ticket: TicketProps) => void;
+  openShowSendMessageDialog: (open: boolean) => void;
 }
-function TicketItem({ ticket, onShowTickedValue }: TicketItemProps) {
+function TicketItem({
+  ticket,
+  onShowTickedValue,
+  openShowSendMessageDialog,
+}: TicketItemProps) {
   const { Description, ActionDate, TicketNumber } = ticket;
   const timeLeft = getTimeLeftFromTimestamp(ActionDate);
 
   return (
     <>
+      <TicketDetailsDialog
+        openShowSendMessageDialog={openShowSendMessageDialog}
+        ticket={ticket}
+        timeLeft={timeLeft}
+      />
       <div
         onClick={() => onShowTickedValue(ticket)}
         title={Description}
@@ -149,12 +173,19 @@ function TicketItem({ ticket, onShowTickedValue }: TicketItemProps) {
           </span>
         </div>
       </div>
-      <TicketDetailsDialog ticket={ticket} timeLeft={timeLeft} />
     </>
   );
 }
 
-function TicketDetailsCard({ ticket }: { ticket: TicketProps | null }) {
+interface TicketDetailsCardProps {
+  ticket: TicketProps | null;
+  openShowSendMessageDialog: (open: boolean) => void;
+}
+
+function TicketDetailsCard({
+  ticket,
+  openShowSendMessageDialog,
+}: TicketDetailsCardProps) {
   const [isOpen, setIsOpen] = useState<boolean>(!!ticket);
   const mutation = useUpdateTicketStatus();
 
@@ -175,6 +206,7 @@ function TicketDetailsCard({ ticket }: { ticket: TicketProps | null }) {
       {
         onSuccess: () => {
           setIsOpen(true);
+          openShowSendMessageDialog(true);
         },
       }
     );
@@ -207,7 +239,7 @@ function TicketDetailsCard({ ticket }: { ticket: TicketProps | null }) {
         </p>
         <p>
           <span className="font-medium">Address:</span>{" "}
-          {capitalizeSentences(ticket.Address)} — Apt{":"}
+          {capitalizeSentences(ticket.Address)} — Unit{":"}
           {ticket.Apartment}
         </p>
         <p>
@@ -241,14 +273,16 @@ function TicketDetailsCard({ ticket }: { ticket: TicketProps | null }) {
 function TicketDetailsDialog({
   ticket,
   timeLeft,
+  openShowSendMessageDialog,
 }: {
   ticket: TicketProps | null;
   timeLeft: string;
+  openShowSendMessageDialog: (open: boolean) => void;
 }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const mutation = useUpdateTicketStatus();
 
   if (!ticket) return null;
-  const mutation = useUpdateTicketStatus();
 
   const formattedDate = format(
     ticket.ActionDate.toDate(),
@@ -261,6 +295,7 @@ function TicketDetailsDialog({
       {
         onSuccess: () => {
           setIsOpen(false);
+          openShowSendMessageDialog(true);
         },
       }
     );
@@ -300,7 +335,7 @@ function TicketDetailsDialog({
           </p>
           <p>
             <span className="font-medium">Address:</span>{" "}
-            {capitalizeSentences(ticket.Address)} — Apt{":"}
+            {capitalizeSentences(ticket.Address)} — Unit{":"}
             {ticket.Apartment}
           </p>
           <p>

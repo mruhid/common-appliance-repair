@@ -186,7 +186,7 @@ function InvoiceDetailsCard({ invoice }: { invoice: InvoiceProps | null }) {
         </p>
         <p>
           <span className="font-medium">Address:</span>{" "}
-          {capitalizeSentences(invoice.Address)} — Apt{":"}
+          {capitalizeSentences(invoice.Address)} — Unit{":"}
           {invoice.Apartment}
         </p>
         <p>
@@ -286,7 +286,7 @@ function InvoiceDetailsDialog({
           </p>
           <p>
             <span className="font-medium">Address:</span>{" "}
-            {capitalizeSentences(invoice.Address)} — Apt {invoice.Apartment}
+            {capitalizeSentences(invoice.Address)} — Unit {invoice.Apartment}
           </p>
           <p>
             <span className="font-medium">Technician:</span>{" "}

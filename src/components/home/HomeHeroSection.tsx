@@ -6,11 +6,6 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 
 export default function HomeHeroSection() {
-  const fadeVariant = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { delay: 0.2, duration: 0.5 } },
-  };
-
   return (
     <motion.main
       variants={staggerContainer()}

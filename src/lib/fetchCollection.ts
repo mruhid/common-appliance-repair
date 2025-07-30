@@ -14,7 +14,7 @@ import {
   where,
 } from "firebase/firestore";
 import { app, db } from "./firebase";
-import { CCSTaffProps } from "./types";
+import { CCSTaffProps, EmployeeProps } from "./types";
 
 const cursorCache: Record<number, QueryDocumentSnapshot<DocumentData> | null> =
   {};
@@ -40,6 +40,20 @@ export const fetchDocument = async <T>(
   }
   return { id: snapshot.id, ...snapshot.data() } as T;
 };
+
+export async function findEmployeeByName(
+  name: string
+): Promise<EmployeeProps | null> {
+  if (!name.trim()) return null;
+
+  const employeeRef = collection(db, "employees");
+  const q = query(employeeRef, where("name", "==", name));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return null;
+
+  return snapshot.docs[0].data() as EmployeeProps;
+}
 
 export async function findUserByCredentials(
   username: string,

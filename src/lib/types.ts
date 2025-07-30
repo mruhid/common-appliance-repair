@@ -33,3 +33,8 @@ export interface InvoiceProps {
   TicketStatus: TicketStatusTypes;
   TotalPrice: number;
 }
+
+export interface EmployeeProps {
+  PhoneNumber: string;
+  name: string;
+}

@@ -64,7 +64,7 @@ function useFirebaseDocumentSearch<T = DocumentData>(
               id: doc.id,
               ...doc.data(),
             })) as T[];
-            break; // Stop after first match
+            break;
           }
         }
 
@@ -73,8 +73,12 @@ function useFirebaseDocumentSearch<T = DocumentData>(
         } else {
           setNotFound(true);
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to search.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "Failed to search.");
+        } else {
+          setError("Failed to search.");
+        }
       } finally {
         setIsPending(false);
       }

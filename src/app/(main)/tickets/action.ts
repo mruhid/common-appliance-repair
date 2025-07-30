@@ -14,7 +14,6 @@ export async function updateClosedTicketStatus(
   ticketNumber: string
 ): Promise<{ success: boolean; ticketNumber: string }> {
   try {
-    // 1. Check ticket in Tickets collection
     const ticketsRef = collection(db, "Tickets");
     const ticketQuery = query(
       ticketsRef,
@@ -52,10 +51,15 @@ export async function updateClosedTicketStatus(
     });
 
     return { success: true, ticketNumber };
-  } catch (error: any) {
-    console.error(error.message);
-    throw new Error(
-      error.message || "Something went wrong while updating ticket status."
-    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      throw new Error(
+        error.message || "Something went wrong while updating ticket status."
+      );
+    } else {
+      console.error("Unknown error", error);
+      throw new Error("Something went wrong while updating ticket status.");
+    }
   }
 }

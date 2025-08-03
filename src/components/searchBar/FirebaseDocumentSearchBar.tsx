@@ -147,6 +147,7 @@ function SearchSection<T>({
                           ([key]) =>
                             !["id", "Done", "TicketNumber"].includes(key)
                         )
+                        .sort(([a], [b]) => a.localeCompare(b))
                         .map(([key, value]) => (
                           <p key={key}>
                             <span className="font-semibold">{key}:</span>{" "}

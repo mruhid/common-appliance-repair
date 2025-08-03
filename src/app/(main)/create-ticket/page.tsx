@@ -1,8 +1,7 @@
+import Logo from "@/assets/colored-logo.png";
 import { Metadata } from "next";
 import Image from "next/image";
-import Logo from "@/assets/colored-logo.png";
 import CreateTicketForm from "./CreateTicketForm";
-import ServiceCallPolicyDialog from "@/components/ServiceCallPolicyDialog";
 
 export const metadata: Metadata = {
   title: "New Service Ticket",
@@ -10,17 +9,25 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <main className="w-full px-2 bg-white h-screen flex flex-col">
-      <div className="grid px-6 grid-cols-3 gap-4">
-        <div className="flex items-center space-x-1">
-          <Image src={Logo} alt="Company logo" width={300} />
-          <ServiceCallPolicyDialog />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:px-6 py-4">
+        <div className="flex flex-col md:flex-row items-center  md:items-start gap-2 md:space-x-2">
+          <Image
+            src={Logo}
+            alt="Company logo"
+            className="w-48 md:w-60 h-auto object-contain"
+            priority
+          />
         </div>
-        <div className=" flex justify-center items-center text-center text-primary">
-          <h1 className="md:text-5xl text-4xl font-semibold text-[#0d2841]">
+
+        <div className="flex justify-center items-center text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#0d2841]">
             Create Ticket
           </h1>
         </div>
+
+        <div className="hidden md:block" />
       </div>
+
       <CreateTicketForm />
     </main>
   );

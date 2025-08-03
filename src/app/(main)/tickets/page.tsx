@@ -12,27 +12,33 @@ export default function Page() {
   return (
     <LoginModal>
       <div className="flex pt-2 mx-auto w-full px-4 max-w-[1800px] flex-col">
-        <Tabs defaultValue="Open" className="flex  flex-col">
-          <TabsList className="grid  h-20 w-full grid-cols-3 border border-muted-foreground/30 bg-card">
+        <Tabs defaultValue="Open" className="w-full">
+          <TabsList className="flex w-full h-16 border border-muted-foreground/30 bg-card overflow-x-auto">
             <TabsTrigger
               value="Open"
-              className="h-16 rounded-none border-b-[3px] border-secondary bg-secondary text-muted-foreground shadow-sm hover:bg-muted-foreground/10 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md"
+              className="flex flex-row items-center justify-center gap-1 px-4 text-xs sm:text-sm rounded-none border-b-[3px] border-secondary bg-secondary text-muted-foreground shadow-sm hover:bg-muted-foreground/10 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md"
             >
-              <FilePlus className="mr-4" /> <p>Opened Ticket</p>
+              <FilePlus className="size-4 sm:size-5 hidden sm:inline-block" />
+              <span>Opened Ticket</span>
             </TabsTrigger>
+
             <TabsTrigger
               value="Closed"
-              className="h-16 rounded-none border-b-[3px] border-secondary bg-secondary text-muted-foreground shadow-sm hover:bg-muted-foreground/10 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md"
+              className="flex flex-row items-center justify-center gap-1 px-4 text-xs sm:text-sm rounded-none border-b-[3px] border-secondary bg-secondary text-muted-foreground shadow-sm hover:bg-muted-foreground/10 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md"
             >
-              <Archive className="mr-4" /> Closed Ticket
+              <Archive className="size-4 sm:size-5 hidden sm:inline-block" />
+              <span>Closed Ticket</span>
             </TabsTrigger>
+
             <TabsTrigger
               value="Recalled"
-              className="h-16 rounded-none border-b-[3px] border-secondary bg-secondary text-muted-foreground shadow-sm hover:bg-muted-foreground/10 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md"
+              className="flex flex-row items-center justify-center gap-1 px-4 text-xs sm:text-sm rounded-none border-b-[3px] border-secondary bg-secondary text-muted-foreground shadow-sm hover:bg-muted-foreground/10 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md"
             >
-              <RotateCcw className="mr-4" /> Recalled Ticket
+              <RotateCcw className="size-4 sm:size-5 hidden sm:inline-block" />
+              <span>Recalled Ticket</span>
             </TabsTrigger>
           </TabsList>
+
           <TabsContent value="Open">
             <TicketFeed ticketStatus="Open" />
           </TabsContent>

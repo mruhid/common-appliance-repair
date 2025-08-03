@@ -115,7 +115,6 @@ export default function LoginModal({
             <PasswordInput
               className="h-12 bg-background rounded-lg"
               placeholder="Password"
-              type="password"
               name="password"
               value={modalInputs.password}
               onChange={handleInputChange}

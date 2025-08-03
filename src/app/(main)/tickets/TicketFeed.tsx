@@ -162,9 +162,9 @@ function TicketItem({
       >
         <div className="flex w-full justify-between items-start">
           <div className="flex flex-col max-w-[85%]">
-            <h3 className="text-base capitalize font-medium truncate">
-              {Description.slice(0, 35)}
-              {Description.length > 25 ? "..." : ""}
+            <h3 className="text-base  font-medium truncate">
+              {capitalizeSentences(Description.slice(0, 30))}
+              {Description.length > 30 ? "..." : ""}
             </h3>
             <p className="text-sm text-muted-foreground">Deadline {timeLeft}</p>
           </div>
@@ -306,8 +306,9 @@ function TicketDetailsDialog({
         <div className="cursor-pointer flex lg:hidden justify-center items-center rounded-lg border bg-card p-4 shadow hover:bg-accent hover:text-accent-foreground transition">
           <div className="flex w-full justify-between items-start">
             <div className="flex flex-col justify-start items-start max-w-[85%]">
-              <h3 className="text-base capitalize font-medium truncate">
-                {ticket.Description}
+              <h3 className="text-base  font-medium truncate">
+                {capitalizeSentences(ticket.Description.slice(0, 25))}
+                {ticket.Description.length > 18 ? "..." : ""}
               </h3>
               <p className="text-sm text-muted-foreground">
                 Deadline {timeLeft}

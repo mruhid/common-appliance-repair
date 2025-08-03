@@ -44,7 +44,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </ReactQueryProvider>
-        <Toaster />
+        <Toaster position="top-right" />
       </body>
     </html>
   );

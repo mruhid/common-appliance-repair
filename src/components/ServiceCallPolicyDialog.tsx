@@ -14,7 +14,7 @@ export default function ServiceCallPolicyDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <div className="cursor-pointer" title="Click and see company policy">
-          <Info className="size-7 text-primary focus:outline-none" />
+          <Info className="size-6 text-primary focus:outline-none" />
         </div>
       </DialogTrigger>
 

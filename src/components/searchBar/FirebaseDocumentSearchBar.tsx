@@ -128,7 +128,7 @@ function SearchSection<T>({
                 documents.map((item, i) => (
                   <div
                     key={i}
-                    className="border rounded-xl bg-background p-4 shadow hover:shadow-md transition"
+                    className="border rounded-xl bg-background my-2 space-y-1 p-4 shadow hover:shadow-md transition"
                   >
                     {/* Title: TicketNumber */}
                     {item &&

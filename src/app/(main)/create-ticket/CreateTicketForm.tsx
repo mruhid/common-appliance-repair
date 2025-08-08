@@ -66,8 +66,8 @@ export default function CreateTicketForm() {
     retry: 1,
     staleTime: Infinity,
   });
-  const inputDesign = "rounded-xl h-12 border border-[#0d2841] bg-white";
-  const labelDesign = "text-lg text-[#0d2841]";
+  const inputDesign = "rounded-xl h-12 border border-form-color bg-background";
+  const labelDesign = "text-lg text-form-color";
 
   async function onSubmit(formValues: CreateTicketFormValue) {
     startTransition(async () => {
@@ -208,18 +208,18 @@ export default function CreateTicketForm() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="rounded-xl h-12 border border-[#0d2841] bg-white w-full">
+                          <SelectTrigger className="rounded-xl h-12 border border-form-color bg-background w-full">
                             <SelectValue
                               className="h-12"
                               placeholder="Technician"
                             />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="border border-[#0d2841] bg-white text-[#0d2841] rounded-xl">
+                        <SelectContent className="border border-form-color bg-background text-form-color rounded-xl">
                           {isPending && (
                             <>
                               <div className="px-4 py-2">
-                                <Skeleton className="h-10 bg-gray-300 rounded-xl w-full mb-1" />
+                                <Skeleton className="h-10 bg-muted-foreground/50 rounded-xl w-full mb-1" />
                               </div>
                             </>
                           )}
@@ -238,7 +238,7 @@ export default function CreateTicketForm() {
                             employees?.map((emp) => (
                               <SelectItem
                                 key={emp.id}
-                                className="h-12 text-[#0d2841] capitalize"
+                                className="h-12 text-form-color capitalize"
                                 value={emp.name}
                               >
                                 {emp.name}

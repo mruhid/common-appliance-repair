@@ -21,7 +21,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Info } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TicketProps } from "../create-ticket/createTicket";
 import { useUpdateTicketStatus } from "./mutation";
 import SendMessageToTechnicianDialog from "./SendMessageToTechnicanDialog";
@@ -145,6 +145,25 @@ function TicketItem({
   onShowTickedValue,
   openShowSendMessageDialog,
 }: TicketItemProps) {
+  const [sliceLimit, setSliceLimit] = useState(40);
+
+  useEffect(() => {
+    const updateLimit = () => {
+      const width = window.innerWidth;
+      if (width >= 1280)
+        setSliceLimit(60); // XL screens
+      else if (width >= 1024)
+        setSliceLimit(40); // LG screens
+      else if (width >= 768)
+        setSliceLimit(80); // MD screens
+      else setSliceLimit(50); // Small screens
+    };
+
+    updateLimit();
+    window.addEventListener("resize", updateLimit);
+    return () => window.removeEventListener("resize", updateLimit);
+  }, []);
+
   const { Description, ActionDate, TicketNumber } = ticket;
   const timeLeft = getTimeLeftFromTimestamp(ActionDate);
 
@@ -162,9 +181,9 @@ function TicketItem({
       >
         <div className="flex w-full justify-between items-start">
           <div className="flex flex-col max-w-[85%]">
-            <h3 className="text-base  font-medium truncate">
-              {capitalizeSentences(Description.slice(0, 30))}
-              {Description.length > 30 ? "..." : ""}
+            <h3 className="text-base font-medium truncate">
+              {capitalizeSentences(Description.slice(0, sliceLimit))}
+              {Description.length > sliceLimit ? "..." : ""}
             </h3>
             <p className="text-sm text-muted-foreground">Deadline {timeLeft}</p>
           </div>
@@ -280,7 +299,29 @@ function TicketDetailsDialog({
   openShowSendMessageDialog: (open: boolean) => void;
 }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [sliceLimit, setSliceLimit] = useState(20);
+
   const mutation = useUpdateTicketStatus();
+
+  useEffect(() => {
+    const updateLimit = () => {
+      const width = window.innerWidth;
+      if (width >= 1280)
+        setSliceLimit(60); // XL screens
+      else if (width >= 1024)
+        setSliceLimit(40); // LG screens
+      else if (width >= 768)
+        setSliceLimit(70); // MD screens
+      else if (width >= 600) setSliceLimit(60);
+      else if (width >= 500) setSliceLimit(45);
+      else if (width >= 300) setSliceLimit(20);
+      else setSliceLimit(15); // Small screens
+    };
+
+    updateLimit();
+    window.addEventListener("resize", updateLimit);
+    return () => window.removeEventListener("resize", updateLimit);
+  }, []);
 
   if (!ticket) return null;
 
@@ -306,9 +347,9 @@ function TicketDetailsDialog({
         <div className="cursor-pointer flex lg:hidden justify-center items-center rounded-lg border bg-card p-4 shadow hover:bg-accent hover:text-accent-foreground transition">
           <div className="flex w-full justify-between items-start">
             <div className="flex flex-col justify-start items-start max-w-[85%]">
-              <h3 className="text-base  font-medium truncate">
-                {capitalizeSentences(ticket.Description.slice(0, 25))}
-                {ticket.Description.length > 18 ? "..." : ""}
+              <h3 className="text-base font-medium truncate">
+                {capitalizeSentences(ticket.Description.slice(0, sliceLimit))}
+                {ticket.Description.length > sliceLimit ? "..." : ""}
               </h3>
               <p className="text-sm text-muted-foreground">
                 Deadline {timeLeft}

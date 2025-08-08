@@ -91,8 +91,8 @@ export default function TicketFeed({
             )}
 
             <div className="flex-1 h-full min-h-0">
-              <ScrollArea className="h-[42vh]  w-full pr-1">
-                <div className="flex flex-col gap-y-2">
+              <ScrollArea className="h-[42vh] space-y-1 py-1  w-full pr-1">
+                <div className="flex py-3 mb-2 flex-col gap-y-2">
                   {isPending ? (
                     Array.from({ length: 3 }).map((_, i) => (
                       <TicketItemSkeleton key={i} />

@@ -90,7 +90,7 @@ export default function LoginModal({
     <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center gap-4 p-4">
       <div className="flex bg-secondary rounded-lg shadow-sm border w-full max-w-lg p-4 justify-center  items-center">
         <div className="w-full flex flex-col justify-center items-center gap-2 space-y-2">
-          <h1 className="text-2xl font-semibold">Enter Access Code</h1>
+          <h1 className="text-2xl font-semibold">Login</h1>
 
           <p
             className={`text-sm font-semibold text-destructive ${error ? "opacity-100" : "opacity-0"}`}

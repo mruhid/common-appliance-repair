@@ -11,14 +11,14 @@ import { Button } from "./ui/button";
 
 export default function ServiceCallPolicyDialog() {
   return (
-    <Dialog>
+    <Dialog >
       <DialogTrigger asChild>
         <div className="cursor-pointer" title="Click and see company policy">
           <Info className="size-6 text-primary focus:outline-none" />
         </div>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg">
+      <DialogContent showCloseButton={false} className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Service Call Policy Description</DialogTitle>
         </DialogHeader>

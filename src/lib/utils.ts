@@ -13,12 +13,13 @@ export function getTimeLeftFromTimestamp(timestamp: Timestamp): string {
 
   if (actionTime < now) return "Expired";
 
-  return `in ${formatDistanceToNow(actionTime, { addSuffix: false })}`;
+  return `Deadline in ${formatDistanceToNow(actionTime, { addSuffix: false })}`;
 }
+
 export function formattedDate(timestamp: Timestamp): string {
   if (!timestamp || !(timestamp instanceof Timestamp)) return "Invalid date";
   const date = timestamp.toDate();
-  return format(date, "dd MMM yyyy, HH:mm");
+  return format(date, "MMM dd yyyy");
 }
 
 export function capitalizeSentences(text: string): string {

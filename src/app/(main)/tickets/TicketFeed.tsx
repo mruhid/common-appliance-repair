@@ -68,7 +68,7 @@ export default function TicketFeed({
       />
       <div className="flex w-full flex-col items-start">
         <FirebaseDocumentSearchBar<TicketProps>
-          searchBarPlaceholder="Seacrh tickets"
+          searchBarPlaceholder="Search tickets"
           documentName="Tickets"
           fieldsNameArray={["TicketNumber", "Address"]}
         />
@@ -185,10 +185,10 @@ function TicketItem({
               {capitalizeSentences(Description.slice(0, sliceLimit))}
               {Description.length > sliceLimit ? "..." : ""}
             </h3>
-            <p className="text-sm text-muted-foreground">Deadline {timeLeft}</p>
+            <p className="text-sm text-muted-foreground">{timeLeft}</p>
           </div>
           <span className="text-sm font-semibold whitespace-nowrap">
-            TNº {TicketNumber}
+            T #{TicketNumber}
           </span>
         </div>
       </div>
@@ -235,7 +235,7 @@ function TicketDetailsCard({
     <div className="flex  w-full flex-col justify-center rounded-xl border bg-card p-6 shadow-sm space-y-4">
       <div className="w-full flex justify-between items-center">
         <h2 className="text-2xl text-primary font-semibold">
-          Ticket Nº {ticket.TicketNumber}
+          Ticket #{ticket.TicketNumber}
         </h2>
         {ticket.TicketStatus === "Closed" && (
           <LoadingButton
@@ -325,11 +325,6 @@ function TicketDetailsDialog({
 
   if (!ticket) return null;
 
-  const formattedDate = format(
-    ticket.ActionDate.toDate(),
-    "dd MMM yyyy, HH:mm"
-  );
-
   const updateStatusFromClosedToRecalled = () => {
     mutation.mutate(
       { ticketNumber: ticket.TicketNumber },
@@ -352,11 +347,11 @@ function TicketDetailsDialog({
                 {ticket.Description.length > sliceLimit ? "..." : ""}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Deadline {timeLeft}
+                {timeLeft}
               </p>
             </div>
             <span className="text-sm font-semibold whitespace-nowrap">
-              TNº {ticket.TicketNumber}
+              T #{ticket.TicketNumber}
             </span>
           </div>
         </div>
@@ -364,7 +359,7 @@ function TicketDetailsDialog({
       <DialogContent className="p-6">
         <DialogHeader>
           <DialogTitle className="text-primary">
-            Ticket Nº {ticket.TicketNumber}
+            Ticket #{ticket.TicketNumber}
           </DialogTitle>
         </DialogHeader>
 
@@ -394,7 +389,8 @@ function TicketDetailsDialog({
             {ticket.ActionTime}
           </p>
           <p>
-            <span className="font-medium">Action Date:</span> {formattedDate}
+            <span className="font-medium">Action Date:</span>{" "}
+            {formattedDate(ticket.ActionDate)}
           </p>
         </div>
 

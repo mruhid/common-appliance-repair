@@ -58,7 +58,7 @@ export default function InvoicesFeed({
   return (
     <div className="flex w-full flex-col items-start">
       <FirebaseDocumentSearchBar<InvoiceProps>
-        searchBarPlaceholder="Seacrh invoices"
+        searchBarPlaceholder="Search invoices"
         documentName="Jobs"
         fieldsNameArray={["TicketNumber", "Address"]}
       />
@@ -160,10 +160,10 @@ function InvoiceItem({ invoice, onShowInvoiceValue }: InvoiceItemProps) {
               {capitalizeSentences(Description.slice(0, sliceLimit))}
               {Description.length > sliceLimit ? "..." : ""}
             </h3>
-            <p className="text-sm text-muted-foreground">Deadline {timeLeft}</p>
+            <p className="text-sm text-muted-foreground">{timeLeft}</p>
           </div>
           <span className="text-sm font-semibold whitespace-nowrap">
-            TNº {TicketNumber}
+            T #{TicketNumber}
           </span>
         </div>
       </div>
@@ -188,7 +188,7 @@ function InvoiceDetailsCard({ invoice }: { invoice: InvoiceProps | null }) {
     <div className="flex w-full flex-col justify-center rounded-xl border bg-card p-6 shadow-sm space-y-4">
       <div className="w-full flex justify-between items-center">
         <h2 className="text-2xl text-primary font-semibold">
-          Ticket Nº {invoice.TicketNumber}
+          Ticket #{invoice.TicketNumber}
         </h2>
         <Button className="text-primary" variant={"outline"} asChild>
           <Link href={`/invoices/${invoice.id}`}>See invoice</Link>
@@ -296,12 +296,10 @@ function InvoiceDetailsDialog({
                 {capitalizeSentences(invoice.Description.slice(0, sliceLimit))}
                 {invoice.Description.length > sliceLimit ? "..." : ""}
               </h3>
-              <p className="text-sm text-muted-foreground">
-                Deadline {timeLeft}
-              </p>
+              <p className="text-sm text-muted-foreground">{timeLeft}</p>
             </div>
             <span className="text-sm font-semibold whitespace-nowrap">
-              TNº {invoice.TicketNumber}
+              T #{invoice.TicketNumber}
             </span>
           </div>
         </div>
@@ -310,7 +308,7 @@ function InvoiceDetailsDialog({
       <DialogContent className="p-6 max-h-[90vh]  overflow-y-auto">
         <DialogHeader>
           <div className="w-full flex mt-4 text-primary justify-between items-center">
-            <DialogTitle>Ticket Nº {invoice.TicketNumber}</DialogTitle>
+            <DialogTitle>Ticket #{invoice.TicketNumber}</DialogTitle>
             <Button variant={"outline"} asChild>
               <Link href={`/invoices/${invoice.id}`}>See invoice</Link>
             </Button>

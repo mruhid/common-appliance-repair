@@ -10,10 +10,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDocument } from "@/lib/fetchCollection";
 import { InvoiceProps } from "@/lib/types";
-import { capitalizeSentences } from "@/lib/utils";
+import { capitalizeSentences, formattedDate } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { AlertTriangle, Star } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
 
 export default function InvoiceInfo({ id }: { id: string }) {
@@ -51,7 +50,6 @@ export default function InvoiceInfo({ id }: { id: string }) {
   return (
     <div className="p-8 max-w-2xl mx-auto border shadow-md bg-background text-foreground space-y-3">
       <h1 className="text-2xl font-bold text-center mb-6">Invoice</h1>
-
       <div>
         <strong>Customer Name:</strong> {data.CustomerName}
       </div>
@@ -73,10 +71,7 @@ export default function InvoiceInfo({ id }: { id: string }) {
       <div>
         <strong>Total Price:</strong> {data.TotalPrice}
       </div>
-      <div>
-        <strong>Action Date:</strong>{" "}
-        {format(data.ActionDate.toDate(), "dd/MM/yyyy")}
-      </div>
+      <strong>Action Date:</strong> {formattedDate(data.ActionDate)}
       <div>
         <strong>Action Time:</strong> {data.ActionTime}
       </div>
@@ -101,34 +96,29 @@ function InvoiceNotFound({ message }: { message?: string }) {
 }
 
 export function RateBeforeInvoiceDialog() {
-  const [rating, setRating] = useState<number>(0);
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-md h-[300px]">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        // Ignore outside clicks so dialog stays open
+        // Only close via setIsOpen(false) in your button
+      }}
+    >
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-md h-[380px] flex flex-col justify-between"
+      >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-center">
             Please rate our service before reviewing your invoice
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex justify-center  gap-1 py-4">
-          {[1, 2, 3, 4, 5].map((num) => (
-            <Star
-              key={num}
-              className={`w-6 h-6 cursor-pointer transition ${
-                num <= rating
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-400"
-              }`}
-              onClick={() => setRating(num)}
-            />
-          ))}
-        </div>
-
         <DialogFooter className="flex justify-center w-full">
           <a
+            onClick={() => setIsOpen(false)}
             href="https://maps.app.goo.gl/xuSaz5JdBbG6qcpY7?g_st=iw"
             target="_blank"
             rel="noopener noreferrer"

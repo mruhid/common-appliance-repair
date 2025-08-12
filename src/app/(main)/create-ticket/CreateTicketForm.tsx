@@ -140,14 +140,14 @@ export default function CreateTicketForm() {
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
-                  name="Day"
+                  name="Month"
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex flex-col gap-2 justify-start">
-                        <FormLabel className={labelDesign}>Day</FormLabel>
+                        <FormLabel className={labelDesign}>Month</FormLabel>
                         <FormControl>
                           <Input
-                            className={`${inputDesign}`}
+                            className={inputDesign}
                             type="text"
                             {...field}
                           />
@@ -159,14 +159,14 @@ export default function CreateTicketForm() {
                 />
                 <FormField
                   control={form.control}
-                  name="Month"
+                  name="Day"
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex flex-col gap-2 justify-start">
-                        <FormLabel className={labelDesign}>Month</FormLabel>
+                        <FormLabel className={labelDesign}>Day</FormLabel>
                         <FormControl>
                           <Input
-                            className={inputDesign}
+                            className={`${inputDesign}`}
                             type="text"
                             {...field}
                           />

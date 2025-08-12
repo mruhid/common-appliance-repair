@@ -25,11 +25,13 @@ export const createTicketSchema = z.object({
   Address: requiredString,
   Apartment: requiredString,
   CustomerName: requiredString,
-  Phone: requiredString.regex(phoneRegex, "Invalid phone number"),
+  Phone: requiredString
+    .regex(/^\d+$/, { message: "Only numbers are allowed" })
+    .regex(phoneRegex, "Invalid phone number"),
   Description: requiredString
     .min(20, "At least be 20 characters of description")
     .max(200, "Description limit reached"),
-  SC: requiredString,
+  SC: requiredString.regex(/^\d+$/, "Only numbers are allowed"),
   Technician: requiredString,
   ActionDate: requiredString.optional(),
   Done: z.boolean().default(false),

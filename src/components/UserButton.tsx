@@ -61,14 +61,13 @@ export default function UserButton({ className }: UserButtonProps) {
             <p className="text-sm capitalize font-medium">
               @{user ? user.username.split(" ")[0] : ""}
             </p>
-            <p className="text-xs text-muted-foreground">Logged in</p>
           </div>
         </div>
 
         <Link href={`/create-ticket`}>
           <DropdownMenuItem className="rounded-lg py-2 transition-all hover:bg-primary/10">
             <Tickets className="mr-2 size-4" />
-            New Ticket
+            Create Ticket
           </DropdownMenuItem>
         </Link>
         <Link href={`/tickets`}>

@@ -19,7 +19,6 @@ import {
   getTimeLeftFromTimestamp,
 } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TicketProps } from "../create-ticket/createTicket";
@@ -42,6 +41,7 @@ export default function TicketFeed({
   const {
     data: tickets,
     isPending,
+    error,
     isError,
   } = useQuery<TicketProps[]>({
     queryKey: ["tickets", ticketStatus, page],
@@ -188,7 +188,7 @@ function TicketItem({
             <p className="text-sm text-muted-foreground">{timeLeft}</p>
           </div>
           <span className="text-sm font-semibold whitespace-nowrap">
-            T #{TicketNumber}
+            #{TicketNumber}
           </span>
         </div>
       </div>
@@ -346,12 +346,10 @@ function TicketDetailsDialog({
                 {capitalizeSentences(ticket.Description.slice(0, sliceLimit))}
                 {ticket.Description.length > sliceLimit ? "..." : ""}
               </h3>
-              <p className="text-sm text-muted-foreground">
-                {timeLeft}
-              </p>
+              <p className="text-sm text-muted-foreground">{timeLeft}</p>
             </div>
             <span className="text-sm font-semibold whitespace-nowrap">
-              T #{ticket.TicketNumber}
+              #{ticket.TicketNumber}
             </span>
           </div>
         </div>

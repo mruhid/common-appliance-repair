@@ -123,3 +123,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    font-size: 14pt; /* Base font size for A4 — bigger than screen */
+    line-height: 1.4;
+  }
+
+  .print-a4 {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    box-sizing: border-box;
+    page-break-after: always;
+
+    /* Remove screen-only styles */
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .print-a4 h1 {
+    font-size: 28pt; /* Large invoice title */
+  }
+
+  .print-a4 strong {
+    font-size: 14pt;
+  }
+
+  .print-a4 p,
+  .print-a4 span {
+    font-size: 13pt;
+  }
+}

@@ -163,7 +163,7 @@ function InvoiceItem({ invoice, onShowInvoiceValue }: InvoiceItemProps) {
             <p className="text-sm text-muted-foreground">{timeLeft}</p>
           </div>
           <span className="text-sm font-semibold whitespace-nowrap">
-            T #{TicketNumber}
+            #{TicketNumber}
           </span>
         </div>
       </div>
@@ -299,7 +299,7 @@ function InvoiceDetailsDialog({
               <p className="text-sm text-muted-foreground">{timeLeft}</p>
             </div>
             <span className="text-sm font-semibold whitespace-nowrap">
-              T #{invoice.TicketNumber}
+              #{invoice.TicketNumber}
             </span>
           </div>
         </div>

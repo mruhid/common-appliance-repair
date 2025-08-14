@@ -1,8 +1,20 @@
+import { Metadata } from "next";
 import InvoiceInfo, { RateBeforeInvoiceDialog } from "./InvoiceInfo";
 
 interface PageParams {
   params: Promise<{ id: string }>;
 }
+
+export async function generateMetadata({
+  params,
+}: PageParams): Promise<Metadata> {
+  const { id } = await params;
+
+  return {
+    title: `Invoice - ${id}`,
+  };
+}
+
 export default async function Page({ params }: PageParams) {
   const { id } = await params;
   return (

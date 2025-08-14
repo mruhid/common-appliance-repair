@@ -12,18 +12,28 @@ import { fetchDocument } from "@/lib/fetchCollection";
 import { InvoiceProps } from "@/lib/types";
 import { capitalizeSentences, formattedDate } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, Download } from "lucide-react";
+import { useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 
 export default function InvoiceInfo({ id }: { id: string }) {
-  const { data, isLoading, error } = useQuery<InvoiceProps>({
+  const invoiceRef = useRef<HTMLDivElement>(null);
+
+  const { data, isPending, error } = useQuery<InvoiceProps>({
     queryKey: ["invoice", id],
     queryFn: () => fetchDocument<InvoiceProps>("Jobs", id),
     retry: false,
     staleTime: Infinity,
   });
 
-  if (isLoading) {
+  const reactToPrint = useReactToPrint({
+    contentRef: invoiceRef,
+    documentTitle: capitalizeSentences(
+      `${data?.CustomerName}-Invoice` || "Invoice-PDF"
+    ),
+  });
+
+  if (isPending) {
     return (
       <div className="p-6 flex flex-col justify-center items-center">
         <Skeleton className="h-6 w-40 mb-4" />
@@ -48,35 +58,64 @@ export default function InvoiceInfo({ id }: { id: string }) {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto border shadow-md bg-background text-foreground space-y-3">
-      <h1 className="text-2xl font-bold text-center mb-6">Invoice</h1>
-      <div>
-        <strong>Customer Name:</strong> {data.CustomerName}
-      </div>
-      <div>
-        <strong>Phone:</strong> {data.Phone}
-      </div>
-      <div>
-        <strong>Address:</strong> {capitalizeSentences(data.Address)}
-      </div>
-      <div>
-        <strong>Unit:</strong> {data.Apartment}
-      </div>
-      <div>
-        <strong>Technician:</strong> {data.Technician}
-      </div>
-      <div>
-        <strong>Payment Type:</strong> {data.PaymentType}
-      </div>
-      <div>
-        <strong>Total Price:</strong> {data.TotalPrice}
-      </div>
-      <strong>Action Date:</strong> {formattedDate(data.ActionDate)}
-      <div>
-        <strong>Action Time:</strong> {data.ActionTime}
-      </div>
-      <div>
-        <strong>Description:</strong> {capitalizeSentences(data.Description)}
+    <div className="relative z-0 bg-background print:z-auto max-w-md   mx-auto   text-foreground space-y-4">
+      <Button
+        onClick={reactToPrint}
+        title="Download invoice"
+        className="absolute top-2  right-2 print:hidden"
+        variant="outline"
+        size="icon"
+      >
+        <Download />
+      </Button>
+      <div
+        ref={invoiceRef}
+        className="w-full mx-auto p-6 border border-muted-foreground/60  print:shadow-none print:border-none rounded-lg "
+      >
+        <h1 className="text-3xl font-bold text-center mb-8  pb-3">Invoice</h1>
+
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between  pb-1">
+            <strong>Customer Name:</strong>
+            <span>{data.CustomerName}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Phone:</strong>
+            <span>{data.Phone}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Address:</strong>
+            <span>{capitalizeSentences(data.Address)}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Unit:</strong>
+            <span>{data.Apartment}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Technician:</strong>
+            <span>{data.Technician}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Payment Type:</strong>
+            <span>{data.PaymentType}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Total Price:</strong>
+            <span className="font-semibold">${data.TotalPrice}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Action Date:</strong>
+            <span>{formattedDate(data.ActionDate)}</span>
+          </div>
+          <div className="flex justify-between  pb-1">
+            <strong>Action Time:</strong>
+            <span>{data.ActionTime}</span>
+          </div>
+          <div className="flex flex-col pt-2">
+            <strong>Description:</strong>
+            <p className="mt-1">{capitalizeSentences(data.Description)}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

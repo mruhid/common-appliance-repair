@@ -12,7 +12,7 @@ export default function Navbar() {
       variants={navVariants}
       initial="hidden"
       whileInView="show"
-      className="sticky top-0 z-50 w-full backdrop-blur-md bg-secondary/70 "
+      className="sticky top-0 z-50 w-full backdrop-blur-md bg-secondary/70 print:hidden"
     >
       <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
         <motion.div

@@ -1,18 +1,21 @@
+import { TicketStatusTypes, TotalPagesCountProps } from "@/lib/types";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
 interface PaginationProps {
   pageNumber: number;
-  totalPages: number;
+  totalPages: TotalPagesCountProps;
   setPageNumber: (n: number) => void;
+  ticketStatus: TicketStatusTypes;
 }
 
 export default function Pagination({
   pageNumber,
   totalPages,
   setPageNumber,
+  ticketStatus,
 }: PaginationProps) {
-  const pageItems = generatePageNumbers(pageNumber, totalPages);
+  const pageItems = generatePageNumbers(pageNumber, totalPages[ticketStatus]);
 
   return (
     <div className="flex justify-center items-center gap-2  select-none">
@@ -47,7 +50,7 @@ export default function Pagination({
       <Button
         onClick={() => setPageNumber(pageNumber + 1)}
         variant={"ghost"}
-        disabled={pageNumber >= totalPages}
+        disabled={pageNumber >= totalPages[ticketStatus]}
         className="px-3 py-1 border rounded disabled:opacity-50"
       >
         Next

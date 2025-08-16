@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { findDocumentsByFieldValuePaginated } from "@/lib/fetchCollection";
-import { TicketStatusTypes } from "@/lib/types";
+import { TicketStatusTypes, TotalPagesCountProps } from "@/lib/types";
 import {
   capitalizeSentences,
   formattedDate,
@@ -24,11 +24,18 @@ import { useEffect, useState } from "react";
 import { TicketProps } from "../create-ticket/createTicket";
 import { useUpdateTicketStatus } from "./mutation";
 import SendMessageToTechnicianDialog from "./SendMessageToTechnicanDialog";
+import ShowExpiredToggle, {
+  ShowExpiredToggleSkeleton,
+} from "@/components/ShowExpiredToggle";
 
 export default function TicketFeed({
   ticketStatus,
+  totalPages,
+  setTotalPages,
 }: {
   ticketStatus: TicketStatusTypes;
+  totalPages: TotalPagesCountProps;
+  setTotalPages: React.Dispatch<React.SetStateAction<TotalPagesCountProps>>;
 }) {
   const [selectedTicket, setSelectedTicket] = useState<TicketProps | null>(
     null
@@ -36,15 +43,17 @@ export default function TicketFeed({
   const [sendMessageDialog, setSendMessageDialog] = useState<boolean>(false);
 
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
+  const [showExpiredTicket, setShowExpiredTicket] = useState(false);
 
   const {
     data: tickets,
     isPending,
-    error,
+    isFetching,
     isError,
+    refetch,
   } = useQuery<TicketProps[]>({
-    queryKey: ["tickets", ticketStatus, page],
+    queryKey: ["tickets", ticketStatus, page, showExpiredTicket],
     queryFn: async () =>
       await findDocumentsByFieldValuePaginated<TicketProps>(
         "Tickets",
@@ -53,11 +62,18 @@ export default function TicketFeed({
         10, //Page size
         page,
         setTotalPages,
+        showExpiredTicket,
         "ActionDate"
       ),
     retry: 1,
     staleTime: Infinity,
   });
+
+  useEffect(() => {
+    if (!isPending && !isFetching) {
+      refetch();
+    }
+  }, [showExpiredTicket, refetch]);
 
   return (
     <>
@@ -74,16 +90,29 @@ export default function TicketFeed({
         />
         <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
           <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">
-            <h2 className="text-2xl text-primary text-center font-semibold py-2">
-              Tickets
-            </h2>
+            <div className="grid items-center grid-cols-2 md:grid-cols-3  gap-2 space-x-2 w-full ">
+              <div className="hidden md:flex"></div>
+              <div className="text-start md:text-center">
+                <h2 className="text-2xl text-primary font-semibold">Tickets</h2>
+              </div>
+              {!isPending && !isFetching ? (
+                <ShowExpiredToggle
+                  showExpired={showExpiredTicket}
+                  onShowExpired={setShowExpiredTicket}
+                  title="Show expired tickets"
+                />
+              ) : (
+                <ShowExpiredToggleSkeleton />
+              )}
+            </div>
 
-            {!isPending ? (
-              totalPages > 1 && (
+            {!isPending && !isFetching ? (
+              totalPages[ticketStatus] > 1 && (
                 <Pagination
                   pageNumber={page}
                   totalPages={totalPages}
                   setPageNumber={setPage}
+                  ticketStatus={ticketStatus}
                 />
               )
             ) : (
@@ -93,7 +122,7 @@ export default function TicketFeed({
             <div className="flex-1 h-full min-h-0">
               <ScrollArea className="h-[42vh] space-y-1 py-1  w-full pr-1">
                 <div className="flex py-3 mb-2 flex-col gap-y-2">
-                  {isPending ? (
+                  {isPending || isFetching ? (
                     Array.from({ length: 3 }).map((_, i) => (
                       <TicketItemSkeleton key={i} />
                     ))

@@ -38,3 +38,9 @@ export interface EmployeeProps {
   PhoneNumber: string;
   name: string;
 }
+
+export interface TotalPagesCountProps {
+  Open: number;
+  Closed: number;
+  Recalled: number;
+}

@@ -8,13 +8,14 @@ import {
   getFirestore,
   limit,
   orderBy,
+  Query,
   query,
   QueryDocumentSnapshot,
   startAfter,
   where,
 } from "firebase/firestore";
 import { app, db } from "./firebase";
-import { CCSTaffProps, EmployeeProps } from "./types";
+import { CCSTaffProps, EmployeeProps, TotalPagesCountProps } from "./types";
 
 const cursorCache: Record<number, QueryDocumentSnapshot<DocumentData> | null> =
   {};
@@ -84,35 +85,72 @@ export async function findDocumentsByFieldValuePaginated<T>(
   fieldValue: string,
   pageSize: number,
   pageNumber: number,
-  setTotalPages: (count: number) => void,
+  setTotalPages: React.Dispatch<React.SetStateAction<TotalPagesCountProps>>,
+  showExpired: boolean,
   orderByFieldName: string
 ): Promise<(T & { id: string })[]> {
   const db = getFirestore(app);
   const collectionRef = collection(db, collectionName);
 
-  const countQuery = query(collectionRef, where(field, "==", fieldValue));
+  // Count total docs (optional: include ActionDate filter only if showExpired is false)
+  let countQuery: Query;
+  if (showExpired) {
+    countQuery = query(collectionRef, where(field, "==", fieldValue));
+  } else {
+    countQuery = query(
+      collectionRef,
+      where(field, "==", fieldValue),
+      where("ActionDate", ">", new Date())
+    );
+  }
+
   const snapshotCount = await getCountFromServer(countQuery);
   const totalCount = snapshotCount.data().count;
   const totalPages = Math.ceil(totalCount / pageSize);
-  setTotalPages(totalPages);
 
-  let baseQuery = query(
-    collectionRef,
-    where(field, "==", fieldValue),
-    orderBy(orderByFieldName, "asc"),
-    limit(pageSize)
-  );
+  setTotalPages((prev) => ({
+    ...prev,
+    [fieldValue]: totalPages,
+  }));
 
+  // Build main query
+  let baseQuery: Query;
+  if (showExpired) {
+    baseQuery = query(
+      collectionRef,
+      where(field, "==", fieldValue),
+      orderBy(orderByFieldName, "asc"),
+      limit(pageSize)
+    );
+  } else {
+    baseQuery = query(
+      collectionRef,
+      where(field, "==", fieldValue),
+      where("ActionDate", ">", new Date()),
+      orderBy(orderByFieldName, "asc"),
+      limit(pageSize)
+    );
+  }
+
+  // Pagination with cursor
   if (pageNumber > 1) {
     const previousCursor = cursorCache[pageNumber - 1];
 
     if (!previousCursor) {
-      const tempQuery = query(
-        collectionRef,
-        where(field, "==", fieldValue),
-        orderBy(orderByFieldName, "asc"),
-        limit((pageNumber - 1) * pageSize)
-      );
+      const tempQuery = showExpired
+        ? query(
+            collectionRef,
+            where(field, "==", fieldValue),
+            orderBy(orderByFieldName, "asc"),
+            limit((pageNumber - 1) * pageSize)
+          )
+        : query(
+            collectionRef,
+            where(field, "==", fieldValue),
+            where("ActionDate", ">", new Date()),
+            orderBy(orderByFieldName, "asc"),
+            limit((pageNumber - 1) * pageSize)
+          );
 
       const tempSnapshot = await getDocs(tempQuery);
       const lastVisible = tempSnapshot.docs[tempSnapshot.docs.length - 1];
@@ -121,13 +159,22 @@ export async function findDocumentsByFieldValuePaginated<T>(
 
     const startAfterDoc = cursorCache[pageNumber - 1];
     if (startAfterDoc) {
-      baseQuery = query(
-        collectionRef,
-        where(field, "==", fieldValue),
-        orderBy(orderByFieldName, "asc"),
-        startAfter(startAfterDoc),
-        limit(pageSize)
-      );
+      baseQuery = showExpired
+        ? query(
+            collectionRef,
+            where(field, "==", fieldValue),
+            orderBy(orderByFieldName, "asc"),
+            startAfter(startAfterDoc),
+            limit(pageSize)
+          )
+        : query(
+            collectionRef,
+            where(field, "==", fieldValue),
+            where("ActionDate", ">", new Date()),
+            orderBy(orderByFieldName, "asc"),
+            startAfter(startAfterDoc),
+            limit(pageSize)
+          );
     }
   }
 

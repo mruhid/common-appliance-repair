@@ -20,7 +20,7 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         companyBtn:
-          "bg-primary rounded-lg  border border-transparent text-white hover:bg-white hover:border-primary hover:text-primary duration-300 transition-all",
+          "bg-primary rounded-lg  border border-transparent text-background hover:bg-background hover:border-primary hover:text-primary duration-300 transition-all",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

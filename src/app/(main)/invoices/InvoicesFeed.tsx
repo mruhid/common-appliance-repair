@@ -1,6 +1,9 @@
 "use client";
 import Pagination, { PaginationSkeleton } from "@/components/Pagination";
 import FirebaseDocumentSearchBar from "@/components/searchBar/FirebaseDocumentSearchBar";
+import ShowExpiredToggle, {
+  ShowExpiredToggleSkeleton,
+} from "@/components/ShowExpiredToggle";
 import { TicketItemSkeleton } from "@/components/TicketItemSkeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +15,11 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { findDocumentsByFieldValuePaginated } from "@/lib/fetchCollection";
-import { InvoiceProps, TicketStatusTypes } from "@/lib/types";
+import {
+  InvoiceProps,
+  TicketStatusTypes,
+  TotalPagesCountProps,
+} from "@/lib/types";
 import {
   capitalizeSentences,
   formattedDate,
@@ -26,18 +33,25 @@ import { useEffect, useState } from "react";
 
 export default function InvoicesFeed({
   ticketStatus,
+  totalPages,
+  setTotalPages,
 }: {
   ticketStatus: TicketStatusTypes;
+  totalPages: TotalPagesCountProps;
+  setTotalPages: React.Dispatch<React.SetStateAction<TotalPagesCountProps>>;
 }) {
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceProps | null>(
     null
   );
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
+  const [showExpiredTicket, setShowExpiredTicket] = useState(false);
 
   const {
     data: invoices,
     isPending,
+    refetch,
+    isFetching,
     isError,
   } = useQuery<InvoiceProps[]>({
     queryKey: ["invoices", ticketStatus, page],
@@ -49,12 +63,18 @@ export default function InvoicesFeed({
         10, //Page size
         page,
         setTotalPages,
+        showExpiredTicket,
         "ActionDate"
       ),
     retry: 1,
     staleTime: Infinity,
   });
 
+  useEffect(() => {
+    if (!isPending && !isFetching) {
+      refetch();
+    }
+  }, [showExpiredTicket, refetch]);
   return (
     <div className="flex w-full flex-col items-start">
       <FirebaseDocumentSearchBar<InvoiceProps>
@@ -64,16 +84,29 @@ export default function InvoicesFeed({
       />
       <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">
-          <h2 className="text-2xl text-primary text-center font-semibold py-2">
-            Invoices
-          </h2>
+          <div className="grid items-center grid-cols-2 md:grid-cols-3  gap-2 space-x-2 w-full ">
+            <div className="hidden md:flex"></div>
+            <div className="text-start md:text-center">
+              <h2 className="text-2xl text-primary font-semibold">Invoices</h2>
+            </div>
+            {!isPending && !isFetching ? (
+              <ShowExpiredToggle
+                showExpired={showExpiredTicket}
+                onShowExpired={setShowExpiredTicket}
+                title="Show expired invoices"
+              />
+            ) : (
+              <ShowExpiredToggleSkeleton />
+            )}
+          </div>
 
-          {!isPending ? (
-            totalPages > 1 && (
+          {!isPending && !isFetching ? (
+            totalPages[ticketStatus] > 1 && (
               <Pagination
                 pageNumber={page}
                 totalPages={totalPages}
                 setPageNumber={setPage}
+                ticketStatus={ticketStatus}
               />
             )
           ) : (
@@ -83,7 +116,7 @@ export default function InvoicesFeed({
           <div className="flex-1 h-full min-h-0">
             <ScrollArea className="h-[42vh] space-y-1 py-1 w-full pr-1">
               <div className="flex flex-col py-3 mb-2 gap-y-2">
-                {isPending ? (
+                {isPending || isFetching ? (
                   Array.from({ length: 3 }).map((_, i) => (
                     <TicketItemSkeleton key={i} />
                   ))

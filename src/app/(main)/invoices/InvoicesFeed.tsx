@@ -26,7 +26,6 @@ import {
   getTimeLeftFromTimestamp,
 } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { Info } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -314,11 +313,6 @@ function InvoiceDetailsDialog({
 
   if (!invoice) return null;
 
-  const formattedDate = format(
-    invoice.ActionDate.toDate(),
-    "dd MMM yyyy, HH:mm"
-  );
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
@@ -377,8 +371,8 @@ function InvoiceDetailsDialog({
             {invoice.ActionTime}
           </p>
           <p>
-            <span className="font-medium">Action Date:</span> {timeLeft} |{" "}
-            {formattedDate}
+            <span className="font-medium">Action Date:</span>{" "}
+            {formattedDate(invoice.ActionDate)}
           </p>
           <p>
             <span className="font-medium">Number of Parts:</span>{" "}

@@ -22,6 +22,25 @@ export const metadata: Metadata = {
   },
   description:
     "Internal call center tool for logging and assigning appliance repair tickets to field engineers.",
+  keywords: [
+    "Appliance Repair",
+    "Customer Service",
+    "Ticket Management",
+    "Repair Dashboard",
+    "Field Engineers",
+    "Internal Tools",
+  ],
+  authors: [{ name: "Common Appliance Repair Team" }],
+  creator: "Common Appliance Repair",
+  publisher: "Common Appliance Repair",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 export default function RootLayout({
   children,

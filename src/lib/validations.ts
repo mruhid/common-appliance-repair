@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const requiredString = z.string().trim().min(1, "Required");
-const phoneRegex = /^\+?\d{10,15}$/;
+const phoneRegex = /^\+?\d{7,15}$/;
 
 export const createTicketSchema = z.object({
   Day: requiredString.refine(
@@ -26,12 +26,15 @@ export const createTicketSchema = z.object({
   Apartment: requiredString,
   CustomerName: requiredString,
   Phone: requiredString
-    .regex(/^\d+$/, { message: "Only numbers are allowed" })
+    .regex(/^\+?\d+$/, { message: "Only numbers are allowed" })
     .regex(phoneRegex, "Invalid phone number"),
   Description: requiredString
     .min(20, "At least be 20 characters of description")
     .max(200, "Description limit reached"),
-  SC: requiredString.regex(/^\d+$/, "Only numbers are allowed"),
+  SC: requiredString.regex(
+    /^[1-9]\d*$/,
+    "Only numbers are allowed and cannot start with 0"
+  ),
   Technician: requiredString,
   ActionDate: requiredString.optional(),
   Done: z.boolean().default(false),

@@ -202,7 +202,9 @@ function TicketItem({
         openShowSendMessageDialog={openShowSendMessageDialog}
         ticket={ticket}
         timeLeft={timeLeft}
+        onClick={() => onShowTickedValue(ticket)}
       />
+
       <div
         onClick={() => onShowTickedValue(ticket)}
         title={Description}
@@ -322,10 +324,12 @@ function TicketDetailsDialog({
   ticket,
   timeLeft,
   openShowSendMessageDialog,
+  onClick,
 }: {
   ticket: TicketProps | null;
   timeLeft: string;
   openShowSendMessageDialog: (open: boolean) => void;
+  onClick: () => void;
 }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [sliceLimit, setSliceLimit] = useState(20);
@@ -367,7 +371,7 @@ function TicketDetailsDialog({
   };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>
+      <DialogTrigger asChild onClick={onClick}>
         <div className="cursor-pointer flex lg:hidden justify-center items-center rounded-lg border bg-card p-4 shadow hover:bg-accent hover:text-accent-foreground transition">
           <div className="flex w-full justify-between items-start">
             <div className="flex flex-col justify-start items-start max-w-[85%]">

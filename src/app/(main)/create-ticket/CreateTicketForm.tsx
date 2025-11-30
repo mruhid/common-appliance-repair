@@ -20,13 +20,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchCollection } from "@/lib/fetchCollection";
 import { EmployeesProps, TicketStatusTypes } from "@/lib/types";
-import { capitalizeSentences, cn } from "@/lib/utils";
+import { capitalizeSentences, cn, formattedDate } from "@/lib/utils";
 import { CreateTicketFormValue, createTicketSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Timestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import LoginModal from "../LoginModal";
@@ -34,6 +34,7 @@ import { createTicket } from "./createTicket";
 
 export default function CreateTicketForm() {
   const [isSubmitPending, startTransition] = useTransition();
+  const [dateOnThePast, setDateOnThePast] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(createTicketSchema),
@@ -100,6 +101,20 @@ export default function CreateTicketForm() {
       const day = Number(Day);
       const jsDate = new Date(year, month, day);
 
+      if (Day.trim() && Month.trim() && Year.trim()) {
+        const isPast = jsDate < new Date();
+        setDateOnThePast(isPast);
+
+        if (isPast) {
+          toast.warning(
+            "The chosen date has already passed. Pick a date later than today",
+            {
+              description: formattedDate(Timestamp.fromDate(jsDate)),
+            }
+          );
+          return;
+        }
+      }
       const firebaseData = {
         ActionDate: Timestamp.fromDate(jsDate),
         ActionTime,
@@ -136,22 +151,120 @@ export default function CreateTicketForm() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-3 px-4 py-2 max-w-7xl mx-auto"
           >
-            <div className="grid grid-cols-1  gap-4 md:grid-cols-3">
-              <div className="grid grid-cols-3 gap-4">
+            <div className="w-full flex flex-col gap-2">
+              <div className="grid grid-cols-1  gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="Month"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex flex-col gap-2 justify-start">
+                          <FormLabel className={labelDesign}>Month</FormLabel>
+                          <FormControl>
+                            <Input
+                              className={inputDesign}
+                              type="text"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="Day"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex flex-col gap-2 justify-start">
+                          <FormLabel className={labelDesign}>Day</FormLabel>
+                          <FormControl>
+                            <Input
+                              className={`${inputDesign}`}
+                              type="text"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="Year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex flex-col gap-2 justify-start">
+                          <FormLabel className={labelDesign}>Year</FormLabel>
+                          <FormControl>
+                            <Input
+                              className={inputDesign}
+                              type="text"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
-                  name="Month"
+                  name="Technician"
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex flex-col gap-2 justify-start">
-                        <FormLabel className={labelDesign}>Month</FormLabel>
-                        <FormControl>
-                          <Input
-                            className={inputDesign}
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
+                        <FormLabel className={labelDesign}>
+                          Technician
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="rounded-xl h-12 border border-form-color bg-background w-full">
+                              <SelectValue
+                                className="h-12"
+                                placeholder="Technician"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="border border-form-color bg-background text-form-color rounded-xl">
+                            {isPending && (
+                              <>
+                                <div className="px-4 py-2">
+                                  <Skeleton className="h-10 bg-muted-foreground/50 rounded-xl w-full mb-1" />
+                                </div>
+                              </>
+                            )}
+
+                            {isError && (
+                              <SelectItem
+                                className="text-destructive cursor-not-allowed"
+                                disabled
+                                value="error"
+                              >
+                                Cannot connect to server
+                              </SelectItem>
+                            )}
+                            {!isPending &&
+                              !isError &&
+                              employees?.map((emp, i) => (
+                                <SelectItem
+                                  key={i}
+                                  className="h-12 text-form-color capitalize"
+                                  value={emp.name}
+                                >
+                                  {emp.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+
                         <FormMessage />
                       </div>
                     </FormItem>
@@ -159,11 +272,11 @@ export default function CreateTicketForm() {
                 />
                 <FormField
                   control={form.control}
-                  name="Day"
+                  name="SC"
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex flex-col gap-2 justify-start">
-                        <FormLabel className={labelDesign}>Day</FormLabel>
+                        <FormLabel className={labelDesign}>SC</FormLabel>
                         <FormControl>
                           <Input
                             className={`${inputDesign}`}
@@ -176,102 +289,15 @@ export default function CreateTicketForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="Year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex flex-col gap-2 justify-start">
-                        <FormLabel className={labelDesign}>Year</FormLabel>
-                        <FormControl>
-                          <Input
-                            className={inputDesign}
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
               </div>
-              <FormField
-                control={form.control}
-                name="Technician"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex flex-col gap-2 justify-start">
-                      <FormLabel className={labelDesign}>Technician</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="rounded-xl h-12 border border-form-color bg-background w-full">
-                            <SelectValue
-                              className="h-12"
-                              placeholder="Technician"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="border border-form-color bg-background text-form-color rounded-xl">
-                          {isPending && (
-                            <>
-                              <div className="px-4 py-2">
-                                <Skeleton className="h-10 bg-muted-foreground/50 rounded-xl w-full mb-1" />
-                              </div>
-                            </>
-                          )}
-
-                          {isError && (
-                            <SelectItem
-                              className="text-destructive cursor-not-allowed"
-                              disabled
-                              value="error"
-                            >
-                              Cannot connect to server
-                            </SelectItem>
-                          )}
-                          {!isPending &&
-                            !isError &&
-                            employees?.map((emp) => (
-                              <SelectItem
-                                key={emp.id}
-                                className="h-12 text-form-color capitalize"
-                                value={emp.name}
-                              >
-                                {emp.name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="SC"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex flex-col gap-2 justify-start">
-                      <FormLabel className={labelDesign}>SC</FormLabel>
-                      <FormControl>
-                        <Input
-                          className={`${inputDesign}`}
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
+              {dateOnThePast && (
+                <p className="text-destructive">
+                  The selected date is in the past. Please choose a date in the
+                  future
+                </p>
+              )}
             </div>
+
             <div className="grid md:grid-cols-3 grid-cols-1  gap-4">
               <FormField
                 control={form.control}

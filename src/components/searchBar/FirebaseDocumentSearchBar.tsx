@@ -1,11 +1,13 @@
 "use client";
+import { useUpdateTicketStatus } from "@/app/(main)/tickets/mutation";
 import { formattedDate, getTimeLeftFromTimestamp } from "@/lib/utils";
 import { Timestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Loader2, SearchIcon, XIcon } from "lucide-react";
 import { useState } from "react";
+import LoadingButton from "../LoadingButton";
 import { Button } from "../ui/button";
 import useFirebaseDocumentSearch from "./useFirebaseDocumentSearch";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface FirebaseDocumentSearchBarProps {
   documentName: string;
@@ -55,12 +57,27 @@ function SearchSection<T>({
   fieldsNameArray,
 }: SearchSectionProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [recalledTickets, setRecalledTickets] = useState<string | null>(null);
+  const mutation = useUpdateTicketStatus();
 
   const { documents, isPending, notFound, error } =
     useFirebaseDocumentSearch<T>(documentName, fieldsNameArray, searchTerm);
 
   if (!isOpen) return null;
 
+  const updateStatusFromClosedToRecalled = (ticket: string | null) => {
+    if (!ticket) return;
+    setRecalledTickets(ticket);
+    mutation.mutate(
+      { ticketNumber: ticket },
+      {
+        onSuccess: () => {
+          setSearchTerm("");
+          onOpenChange(false);
+        },
+      }
+    );
+  };
   return (
     <AnimatePresence>
       <motion.div
@@ -88,7 +105,7 @@ function SearchSection<T>({
             <SearchIcon className="size-5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Write on here..."
+              placeholder={`Write on here some info: ${fieldsNameArray.length ? fieldsNameArray.map((a) => a.toLowerCase()).join(", ") : "number, unit and etc..."}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-transparent outline-none w-full text-base placeholder:text-muted-foreground"
@@ -130,17 +147,50 @@ function SearchSection<T>({
                     key={i}
                     className="border rounded-xl bg-background my-2 space-y-1 p-4 shadow hover:shadow-md transition"
                   >
-                    {/* Title: TicketNumber */}
-                    {item &&
-                      typeof item === "object" &&
-                      "TicketNumber" in item &&
-                      typeof item["TicketNumber"] === "string" && (
-                        <h3 className="text-lg font-semibold mb-2 text-primary">
-                          Ticket Nº {item["TicketNumber"]}
-                        </h3>
-                      )}
+                    {
+                      <div className="w-full flex justify-between">
+                        {item &&
+                          typeof item === "object" &&
+                          "TicketNumber" in item &&
+                          typeof item["TicketNumber"] === "string" && (
+                            <h3 className="text-lg font-semibold mb-2 text-primary">
+                              Ticket Nº {item["TicketNumber"]}
+                            </h3>
+                          )}
+                        {item &&
+                          documentName.toLowerCase() === "tickets" &&
+                          typeof item === "object" &&
+                          "TicketStatus" in item &&
+                          typeof item["TicketStatus"] === "string" &&
+                          item.TicketStatus.toLowerCase() === "closed" && (
+                            <LoadingButton
+                              loading={
+                                mutation.isPending &&
+                                item &&
+                                typeof item === "object" &&
+                                "TicketNumber" in item &&
+                                typeof item["TicketNumber"] === "string" &&
+                                item["TicketNumber"] === recalledTickets
+                              }
+                              onClick={() =>
+                                updateStatusFromClosedToRecalled(
+                                  item &&
+                                    typeof item === "object" &&
+                                    "TicketNumber" in item &&
+                                    typeof item["TicketNumber"] === "string"
+                                    ? item["TicketNumber"]
+                                    : null
+                                )
+                              }
+                              variant={"companyBtn"}
+                              className="rounded-md"
+                            >
+                              Recalled
+                            </LoadingButton>
+                          )}
+                      </div>
+                    }
 
-                    {/* Key-Value Fields */}
                     <div className="space-y-1 text-sm text-muted-foreground">
                       {Object.entries(item as Record<string, unknown>)
                         .filter(

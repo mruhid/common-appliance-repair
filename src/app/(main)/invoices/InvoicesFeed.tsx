@@ -79,7 +79,7 @@ export default function InvoicesFeed({
       <FirebaseDocumentSearchBar<InvoiceProps>
         searchBarPlaceholder="Search invoices"
         documentName="Jobs"
-        fieldsNameArray={["TicketNumber", "Address"]}
+        fieldsNameArray={["TicketNumber", "Address", "Phone"]}
       />
       <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">

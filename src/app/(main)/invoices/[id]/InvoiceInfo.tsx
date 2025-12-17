@@ -1,4 +1,5 @@
 "use client";
+import A4Invoice from "@/components/A4Invoice";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,8 +18,7 @@ import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 
 export default function InvoiceInfo({ id }: { id: string }) {
-  const invoiceRef = useRef<HTMLDivElement>(null);
-
+  const printWrapperRef = useRef<HTMLDivElement>(null);
   const { data, isPending, error } = useQuery<InvoiceProps>({
     queryKey: ["invoice", id],
     queryFn: () => fetchDocument<InvoiceProps>("Jobs", id),
@@ -27,7 +27,7 @@ export default function InvoiceInfo({ id }: { id: string }) {
   });
 
   const reactToPrint = useReactToPrint({
-    contentRef: invoiceRef,
+    contentRef: printWrapperRef,
     documentTitle: capitalizeSentences(
       `${data?.CustomerName}-Invoice` || "Invoice-PDF"
     ),
@@ -58,66 +58,122 @@ export default function InvoiceInfo({ id }: { id: string }) {
   }
 
   return (
-    <div className="relative z-0 bg-background print:z-auto max-w-md   mx-auto   text-foreground space-y-4">
-      <Button
-        onClick={reactToPrint}
-        title="Download invoice"
-        className="absolute top-2  right-2 print:hidden"
-        variant="outline"
-        size="icon"
-      >
-        <Download />
-      </Button>
-      <div
-        ref={invoiceRef}
-        className="w-full mx-auto p-6 border border-muted-foreground/60  print:shadow-none print:border-none rounded-lg "
-      >
-        <h1 className="text-3xl font-bold text-center mb-8  pb-3">Invoice</h1>
+    <>
+      <div className="hidden">
+        <div ref={printWrapperRef}>
+          {/* Page 1 */}
+          <div className="w-full mx-auto h-[297mm]  bg-white p-6">
+            <h1 className="text-3xl font-bold text-center mb-8  pb-3">
+              Invoice
+            </h1>
 
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between  pb-1">
-            <strong>Customer Name:</strong>
-            <span>{data.CustomerName}</span>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between  pb-1">
+                <strong>Customer Name:</strong>
+                <span>{data.CustomerName}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Phone:</strong>
+                <span>{data.Phone}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Address:</strong>
+                <span>{capitalizeSentences(data.Address)}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Unit:</strong>
+                <span>{data.Apartment}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Technician:</strong>
+                <span>{data.Technician}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Payment Type:</strong>
+                <span>{data.PaymentType}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Total Price:</strong>
+                <span className="font-semibold">${data.TotalPrice}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Action Date:</strong>
+                <span>{formattedDate(data.ActionDate)}</span>
+              </div>
+              <div className="flex justify-between  pb-1">
+                <strong>Action Time:</strong>
+                <span>{data.ActionTime}</span>
+              </div>
+              <div className="flex flex-col pt-2">
+                <strong>Description:</strong>
+                <p className="mt-1">{capitalizeSentences(data.Description)}</p>
+              </div>
+            </div>
           </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Phone:</strong>
-            <span>{data.Phone}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Address:</strong>
-            <span>{capitalizeSentences(data.Address)}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Unit:</strong>
-            <span>{data.Apartment}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Technician:</strong>
-            <span>{data.Technician}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Payment Type:</strong>
-            <span>{data.PaymentType}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Total Price:</strong>
-            <span className="font-semibold">${data.TotalPrice}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Action Date:</strong>
-            <span>{formattedDate(data.ActionDate)}</span>
-          </div>
-          <div className="flex justify-between  pb-1">
-            <strong>Action Time:</strong>
-            <span>{data.ActionTime}</span>
-          </div>
-          <div className="flex flex-col pt-2">
-            <strong>Description:</strong>
-            <p className="mt-1">{capitalizeSentences(data.Description)}</p>
+
+          {/* Page 2 */}
+          <A4Invoice />
+        </div>
+      </div>
+
+      <div className="relative z-0 bg-background print:z-auto max-w-md   mx-auto   text-foreground space-y-4">
+        <Button
+          onClick={reactToPrint}
+          title="Download invoice"
+          className="absolute top-2  right-2 print:hidden"
+          variant="outline"
+          size="icon"
+        >
+          <Download />
+        </Button>
+        <div className="w-full mx-auto p-6 border border-muted-foreground/60  print:shadow-none print:border-none rounded-lg ">
+          <h1 className="text-3xl font-bold text-center mb-8  pb-3">Invoice</h1>
+
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between  pb-1">
+              <strong>Customer Name:</strong>
+              <span>{data.CustomerName}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Phone:</strong>
+              <span>{data.Phone}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Address:</strong>
+              <span>{capitalizeSentences(data.Address)}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Unit:</strong>
+              <span>{data.Apartment}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Technician:</strong>
+              <span>{data.Technician}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Payment Type:</strong>
+              <span>{data.PaymentType}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Total Price:</strong>
+              <span className="font-semibold">${data.TotalPrice}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Action Date:</strong>
+              <span>{formattedDate(data.ActionDate)}</span>
+            </div>
+            <div className="flex justify-between  pb-1">
+              <strong>Action Time:</strong>
+              <span>{data.ActionTime}</span>
+            </div>
+            <div className="flex flex-col pt-2">
+              <strong>Description:</strong>
+              <p className="mt-1">{capitalizeSentences(data.Description)}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -140,6 +196,8 @@ export function RateBeforeInvoiceDialog() {
   return (
     <Dialog
       open={isOpen}
+      
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onOpenChange={(open) => {
         // Ignore outside clicks so dialog stays open
         // Only close via setIsOpen(false) in your button

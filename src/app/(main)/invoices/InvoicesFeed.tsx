@@ -28,7 +28,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Info } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function InvoicesFeed({
   ticketStatus,
@@ -46,11 +46,15 @@ export default function InvoicesFeed({
 
   const [showExpiredTicket, setShowExpiredTicket] = useState(false);
 
+  const fieldsNameArray = useMemo(
+    () => ["TicketNumber", "Address", "Phone"],
+    []
+  );
   const {
     data: invoices,
     isPending,
-    refetch,
     isFetching,
+    refetch,
     isError,
   } = useQuery<InvoiceProps[]>({
     queryKey: ["invoices", ticketStatus, page],
@@ -70,24 +74,25 @@ export default function InvoicesFeed({
   });
 
   useEffect(() => {
-    if (!isPending && !isFetching) {
-      refetch();
-    }
+    refetch();
   }, [showExpiredTicket, refetch]);
+
   return (
     <div className="flex w-full flex-col items-start">
       <FirebaseDocumentSearchBar<InvoiceProps>
         searchBarPlaceholder="Search invoices"
         documentName="Jobs"
-        fieldsNameArray={["TicketNumber", "Address", "Phone"]}
+        fieldsNameArray={fieldsNameArray}
       />
+
       <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">
           <div className="grid items-center grid-cols-2 md:grid-cols-3  gap-2 space-x-2 w-full ">
-            <div className="hidden md:flex"></div>
             <div className="text-start md:text-center">
+              <div className="hidden md:flex"></div>
               <h2 className="text-2xl text-primary font-semibold">Invoices</h2>
             </div>
+
             {!isPending && !isFetching ? (
               <ShowExpiredToggle
                 showExpired={showExpiredTicket}

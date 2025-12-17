@@ -53,7 +53,7 @@ export function useUpdateTicketStatus() {
       toast.success(`TN-${ticketNumber} ticket is recalled`);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-feedback"] });
+      queryClient.invalidateQueries({ queryKey: ["tickets", "Closed"] });
     },
     onError(error) {
       console.error(error);

@@ -20,8 +20,8 @@ const eslintConfig = [
         { allowSingleExtends: true },
       ],
 
-      // ✅ Disable this rule completely
-      "@typescript-eslint/no-empty-object-type": "off",
+      // // ✅ Disable this rule completely
+      // "@typescript-eslint/no-empty-object-type": "off",
     },
   },
 ];

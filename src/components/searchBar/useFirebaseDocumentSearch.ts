@@ -1,16 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
-import {
-  getDocs,
-  collection,
-  query,
-  orderBy,
-  startAt,
-  endAt,
-  DocumentData,
-} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { capitalizeSentences } from "@/lib/utils";
+import {
+  collection,
+  DocumentData,
+  endAt,
+  getDocs,
+  orderBy,
+  query,
+  startAt,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 export interface FirebaseSearchResult<T = DocumentData> {
   documents: T[];
@@ -58,7 +58,9 @@ function useFirebaseDocumentSearch<T = DocumentData>(
             startAt(formattedSearchValue),
             endAt(formattedSearchValue + "\uf8ff")
           );
+
           const snapshot = await getDocs(q);
+
           if (!snapshot.empty) {
             foundDocs = snapshot.docs.map((doc) => ({
               id: doc.id,

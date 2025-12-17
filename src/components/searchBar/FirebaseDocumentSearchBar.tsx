@@ -74,6 +74,7 @@ function SearchSection<T>({
         onSuccess: () => {
           setSearchTerm("");
           onOpenChange(false);
+          window.location.reload();
         },
       }
     );

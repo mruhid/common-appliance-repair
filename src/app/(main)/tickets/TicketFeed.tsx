@@ -23,7 +23,7 @@ import {
 } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Info } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TicketProps } from "../create-ticket/createTicket";
 import { useUpdateTicketStatus } from "./mutation";
 import SendMessageToTechnicianDialog from "./SendMessageToTechnicanDialog";
@@ -45,6 +45,11 @@ export default function TicketFeed({
   const [page, setPage] = useState(1);
 
   const [showExpiredTicket, setShowExpiredTicket] = useState(false);
+
+  const fieldsNameArray = useMemo(
+    () => ["TicketNumber", "Address", "Phone"],
+    []
+  );
 
   const {
     data: tickets,
@@ -70,9 +75,7 @@ export default function TicketFeed({
   });
 
   useEffect(() => {
-    if (!isPending && !isFetching) {
-      refetch();
-    }
+    refetch();
   }, [showExpiredTicket, refetch]);
 
   return (
@@ -86,7 +89,7 @@ export default function TicketFeed({
         <FirebaseDocumentSearchBar<TicketProps>
           searchBarPlaceholder="Search tickets"
           documentName="Tickets"
-          fieldsNameArray={["TicketNumber", "Address","Phone"]}
+          fieldsNameArray={fieldsNameArray}
         />
         <div className="grid w-full h-[58vh] grid-cols-1 lg:grid-cols-2">
           <div className="flex flex-col gap-y-2 border-r border-muted-foreground/50 px-2 h-full">

@@ -46,10 +46,7 @@ const A4Invoice = forwardRef<HTMLDivElement, A4InvoiceProps>(({children}: { chil
                         </div>
                         <div className="text-2xl font-bold">INVOICE</div>
                     </div>
-                    <div className="w-full flex justify-between ">
-                        <div className="text-xl mt-3 font-bold">
-                            Phone: <span>+1 (774) 414-4038</span>
-                        </div>
+                    <div className="w-full flex justify-between items-center">
                         <div className="relative w-[170px] h-[110px] flex items-center justify-center">
                             <Image
                                 src={Logo}
@@ -58,6 +55,9 @@ const A4Invoice = forwardRef<HTMLDivElement, A4InvoiceProps>(({children}: { chil
                                 className="object-cover invert brightness-90"
                                 priority
                             />
+                        </div>
+                        <div className="text-xl mt-3 font-bold">
+                            Phone: <span>+1 (774) 414-4038</span>
                         </div>
                     </div>
 
@@ -70,16 +70,13 @@ const A4Invoice = forwardRef<HTMLDivElement, A4InvoiceProps>(({children}: { chil
                     <div className="mt-4 text-sm">
                         <div className="font-medium mb-1">Limited warranty & Policy:</div>
                         <div className="whitespace-pre-line">
-                            All materials and parts are warranted for 90 days. All labor
-                            performed is warranted for 30 days. Warranty does not extend to
-                            fuses, freon, filters, access valves and moving parts. Warranty
-                            will not apply if customer fails to contact Common Appliance
-                            Repair LLC within 24 hours from the time when the warranty claim
-                            arose and/or fails to permit to perform warranty service. Warranty
-                            is limited solely to the acts, promises, representations or
-                            omissions of Common Appliance Repair LLC and not any other person,
-                            whether or not the service provided herein is based on the
-                            referral by such person.
+                            All materials and parts are warranted for 60 days. Labor is warranted for 30 days. Warranty
+                            does not cover fuses, filters, belts, access valves, or moving parts.
+                            A deposit is required upon repair approval and is non-refundable once approved. If the
+                            customer cancels or declines after approval, the deposit will not be refunded, as parts may
+                            have been ordered or purchased.
+                            Service call fee is non-refundable.
+                            Common Appliance Repair LLC is not responsible for issues unrelated to the repair performed.
                         </div>
                     </div>
 
@@ -87,29 +84,11 @@ const A4Invoice = forwardRef<HTMLDivElement, A4InvoiceProps>(({children}: { chil
                 <div className="w-full mt-4 text-sm">
                     <div className="font-medium mb-1">Disclaimer or Liability:</div>
                     <div className="whitespace-pre-line">
-                        Customer agrees that Common Appliance Repair LLC will not be
-                        responsible for leaks and scratching or other occurrences causing
-                        spoilage or damage to food, floors, cabinets, counters arising by
-                        reason of service provided hereunder as well as the removal of
-                        appliances or fixtures. Customer understands that Common Appliance
-                        Repair LLC is a subcontractor, which is not responsible for
-                        warranties or representations by contractors or referral.
-                    </div>
-                </div>
-                <div className="w-full mt-4 text-sm">
-                    <div className="font-medium mb-1">Estimate Acknowledgement:</div>
-                    <div className="whitespace-pre-line">
-                        As estimated for repairs shall be given to the customer by the
-                        service dealer in writing, and the service dealer may not charge for
-                        the work done or nee performed in excess of the estimate without
-                        prior consent of the customer. Where provide In writing, the service
-                        dealer may charge a reasonable fee for service, provided in
-                        determining the nature of malfunction in preparation of a written
-                        estimate of repair. For more information, please contact Bureau of
-                        Electronics Repair and Appliances Repair. I acknowledge that I have
-                        authority to order and do hereby order the work outlined herein. I
-                        agree that Common Appliance Repair LLC Retains title In all
-                        equipment and materials until full payment is rendered.
+                        Customer agrees that Common Appliance Repair LLC will not be responsible for leaks and
+                        scratching or other occurrences causing spoilage or damage to food, floors, cabinets, counters
+                        arising by reason of service provided hereunder as well as the removal of appliances or
+                        fixtures. Customer understand that Common Appliance Repair LLC is a subcontractor, which is not
+                        responsible for warranties or representations by contractors or referral.
                     </div>
                 </div>
             </div>

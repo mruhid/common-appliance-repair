@@ -104,7 +104,7 @@ export default function InvoiceInfo({id}: { id: string }) {
                 </div>
             </div>
 
-            <div className="relative z-0 bg-background print:z-auto max-w-md   mx-auto   text-foreground space-y-4">
+            <div className="relative z-0 bg-background print:z-auto   mx-auto   text-foreground space-y-4">
                 <Button
                     onClick={reactToPrint}
                     title="Download invoice"
@@ -115,51 +115,51 @@ export default function InvoiceInfo({id}: { id: string }) {
                     <Download/>
                 </Button>
                 <div
-                    className="w-full mx-auto p-6 border border-muted-foreground/60  print:shadow-none print:border-none rounded-lg ">
-                    <h1 className="text-3xl font-bold text-center mb-8  pb-3">Invoice</h1>
-
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between  pb-1">
-                            <strong>Customer Name:</strong>
-                            <span>{data.CustomerName}</span>
+                    className="w-full mx-auto p-6 border border-muted-foreground/60  print:shadow-none print:border-none">
+                    <A4Invoice>
+                        <div className="space-y-3 text-sm">
+                            <div className="flex justify-between  pb-1">
+                                <strong>Customer Name:</strong>
+                                <span>{data.CustomerName}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Phone:</strong>
+                                <span>{data.Phone}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Address:</strong>
+                                <span>{capitalizeSentences(data.Address)}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Unit:</strong>
+                                <span>{data.Apartment}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Technician:</strong>
+                                <span>{data.Technician}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Payment Type:</strong>
+                                <span>{data.PaymentType}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Total Price:</strong>
+                                <span className="font-semibold">${data.TotalPrice}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Action Date:</strong>
+                                <span>{formattedDate(data.ActionDate)}</span>
+                            </div>
+                            <div className="flex justify-between  pb-1">
+                                <strong>Action Time:</strong>
+                                <span>{data.ActionTime}</span>
+                            </div>
+                            <div className="flex flex-col pt-2">
+                                <strong>Description:</strong>
+                                <p className="mt-1">{capitalizeSentences(data.Description)}</p>
+                            </div>
                         </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Phone:</strong>
-                            <span>{data.Phone}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Address:</strong>
-                            <span>{capitalizeSentences(data.Address)}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Unit:</strong>
-                            <span>{data.Apartment}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Technician:</strong>
-                            <span>{data.Technician}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Payment Type:</strong>
-                            <span>{data.PaymentType}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Total Price:</strong>
-                            <span className="font-semibold">${data.TotalPrice}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Action Date:</strong>
-                            <span>{formattedDate(data.ActionDate)}</span>
-                        </div>
-                        <div className="flex justify-between  pb-1">
-                            <strong>Action Time:</strong>
-                            <span>{data.ActionTime}</span>
-                        </div>
-                        <div className="flex flex-col pt-2">
-                            <strong>Description:</strong>
-                            <p className="mt-1">{capitalizeSentences(data.Description)}</p>
-                        </div>
-                    </div>
+                    </A4Invoice>
                 </div>
             </div>
         </>
